@@ -1,0 +1,90 @@
+Datum,Startzeit,Endzeit,Raum,Titel,Speaker,Kategorie
+Wednesday,09:00,10:00,1,Keynote: AI is having its moment ... again,Jodie Burchell,Talk
+Wednesday,10:20,11:20,1,Java Sucks (So C# Didn't Have To),Adele Carpenter,Talk
+Wednesday,10:20,11:20,2,Navigating complexity in event-driven architectures: A domain-driven approach,David Boyne,Talk
+Wednesday,10:20,11:20,2,The future & challenges of cloud,Anders Lybecker,Talk
+Wednesday,10:20,11:20,3,Better Code Reviews FTW!,Tess Ferrandez-Norlander,Talk
+Wednesday,10:20,11:20,5,Drop the Bass with Embedding and Vectors in Azure AI Search,Alan Smith,Talk
+Wednesday,11:40,12:40,1,Modernizing your legacy application,Nico Vermeir,Talk
+Wednesday,11:40,12:40,2,Your AI Agents Are Overprivileged: The Case for Fine-Grained Authorization,Ashish Jha,Talk
+Wednesday,11:40,12:40,3,Using GenAI on and inside your code, what could possibly go wrong?,Niels Tanis,Talk
+Wednesday,11:40,12:40,5,Code that writes code - .NET Source generators,Glenn F. Henriksen,Talk
+Wednesday,13:40,14:40,1,.NET Aspire Beyond the Introduction,Chris Klug,Talk
+Wednesday,13:40,14:40,2,Prompt. Build. Repeat. – The Vibe Coding Mindset,Daniel Sogl,Talk
+Wednesday,13:40,14:40,3,Demystifying the Enigma Machine - a Functional Journey,Isaac Abraham,Talk
+Wednesday,13:40,14:40,4,Part 1/2: Introduction to capture the flag(CTF) with walkthrough and hands-on practice,Mark Jervelund,Talk
+Wednesday,13:40,14:40,6,Modern .NET Configuration Practices,Chris Ayers,Talk
+Wednesday,13:40,14:40,6,Cross-platform development with .NET MAUI,Anjuli Jhakry,Talk
+Wednesday,15:00,16:00,1,Migrating from a monolith to a new service,Connell Sharp,Talk
+Wednesday,15:00,16:00,2,How To Not Strangle Your Coworkers: Resolving Conflict with Collaboration,Arthur Doler,Talk
+Wednesday,15:00,16:00,3,"Would YOU Survive the Titanic?, with ML and .NET",Simon Painter,Talk
+Wednesday,15:00,16:00,6,Accessibility Testing with Chrome DevTools,Josefine Schaefer,Talk
+Wednesday,15:00,16:00,6,Building Trust in Open Source: A Practical Guide to Securing Your Software Supply Chain,Yash Pimple,Talk
+Wednesday,16:20,17:20,1,The Chips and Pickle Story: What's Really Behind Infamous, Historic UI Failures?,Dean Schuster,Talk
+Wednesday,16:20,17:20,2,Secure your Modular Monolith by pretending it's a cat,William Brander,Talk
+Wednesday,16:20,17:20,3,Dehumanizing Agents: Why Explainability is Crucial in the LLM Era,Lucía Conde-Moreno,Talk
+Wednesday,16:20,17:20,6,Cursed C#,Nick Chapsas,Talk
+Wednesday,17:40,18:40,1,The Forgotten AI of Video Games,Layla Porter,Talk
+Wednesday,17:40,18:40,2,Building the NDC Copenhagen Mobile App Live! with Blazor Hybrid,Gerald Versluis,Talk
+Wednesday,17:40,18:40,3,Leading successful remote teams,Callum Whyte,Talk
+Wednesday,17:40,18:40,6,Hybrid Caching in .NET,Jody Donetti,Talk
+Wednesday,17:40,18:40,6,AI Coding Agents and how to code them,Alex Shershebnev,Talk
+Thursday,09:00,10:00,1,Let’s catch up with C#! Exciting new features in C# 9, 10, 11, 12 and 13!,Filip Ekberg,Talk
+Thursday,09:00,10:00,3,The Shopping Dead: An Accessible Live Web For The Unalive,Daniel Yuschick,Talk
+Thursday,09:00,10:00,5,Typescript. Runtime. And in Between.,Ariel Shulman,Talk
+Thursday,09:00,10:00,6,Managing Terraform modules at scale,Toni Petrina,Talk
+Thursday,10:20,11:20,1,Demystifying authentication in ASP.NET Core,Tore Nestenius,Talk
+Thursday,10:20,11:20,2,So You Want to Maintain a Reliable Event Driven System,James Eastham,Talk
+Thursday,10:20,11:20,3,MCP with .NET: securely exposing your data to LLMs,Callum Whyte,Talk
+Thursday,10:20,11:20,4,Part 1/2: Accessibility: A Little Bit Better Is Better Than Nothing,Lemon 🍋,Talk
+Thursday,10:20,11:20,6,Are you sure your access tokens are really secure?,Wesley Cabus,Talk
+Thursday,10:20,11:20,6,Going Passwordless - A Practical Guide to Passkeys in ASP.NET Core,Maarten Balliauw,Talk
+Thursday,11:40,12:40,1,HTMX & ASP.NET Razor Pages – Web development without the JavaScript pains,Kevin DeRudder,Talk
+Thursday,11:40,12:40,2,Beyond the Prompt: Evaluating, Testing, and Securing LLM Applications,Mete Atamel,Talk
+Thursday,11:40,12:40,3,neo4j for the relational .NET developer,Chris Klug,Talk
+Thursday,11:40,12:40,6,Building AI Agents and Multi-Agent Systems with Azure AI,Henri Schulte,Talk
+Thursday,13:40,14:40,1,Algorithms Demystified,Dylan Beattie,Talk
+Thursday,13:40,14:40,2,What we learned rebuilding the largest Nordic electronic retail website in Next.js?,Tomas Jansson,Talk
+Thursday,13:40,14:40,3,Building Intelligent .NET MAUI Apps with ML.NET,Pieter Nijs,Talk
+Thursday,13:40,14:40,6,Between the Layers– Interpreting Large Language Models,Michelle Frost,Talk
+Thursday,15:00,16:00,1,Cryptography: The Weird Bits,Eli Holderness,Talk
+Thursday,15:00,16:00,2,The Unbearable Weight of Architecture,David Whitney,Talk
+Thursday,15:00,16:00,3,AI vs. Karen: Real-Time Customer Sentiment Detection at Scale,Josef Goldstein,Talk
+Thursday,15:00,16:00,6,Async messaging deep dive with Dapr, take your pub/sub skills to the next level 📨🚀,Marc Duiker,Talk
+Thursday,16:20,17:20,1,Modern Architecture 101 for New Engineers & Forgetful Experts,Jerry Nixon,Talk
+Thursday,16:20,17:20,2,Design for Developers,Lex Lofthouse,Talk
+Thursday,16:20,17:20,5,Adventures at HyperScale!,Stefán Jökull Sigurðarson,Talk
+Thursday,16:20,17:20,6,The Art of Focus: Managing Productivity with an ADHD Brain (And Why It Matters for Everyone),Alyssa Nicoll,Talk
+Thursday,17:40,18:40,1,The Immutable Laws of Software and Life: Code Accordingly,Cory House,Talk
+Thursday,17:40,18:40,2,This time, they will finally realize I'm a fraud.,Eugene Romero,Talk
+Thursday,17:40,18:40,5,WebAssembly & .NET: The Future of Cross-Platform Apps,Dominik Titl,Talk
+Thursday,17:40,18:40,6,Supercharged Search with Semantic Search and Vector Embeddings,Giorgi Dalakishvili,Talk
+Thursday,17:40,18:40,7,Optimize Your Internal OS and Minimize Compatibility Issues at Work,Alice Meredith,Talk
+Thursday,18:40,22:00,Expo,NDC Party,Lars Klint,Talk
+Friday,09:00,10:00,1,What the Soviet Space Program Taught Me About Digital Product Development,Dean Schuster,Talk
+Friday,09:00,10:00,2,Future Proof with ASP.NET Core API Versioning,Jay Harris,Talk
+Friday,09:00,10:00,3,From Days to Hours: How EventStorming Transformed Our Domain Modeling Process,Vadzim Prudnikau,Talk
+Friday,09:00,10:00,5,It’s Not Always About the Index: The Hidden Secrets of Query Performance,Avishag Sahar,Talk
+Friday,09:00,10:00,6,Oops!… We F*ed It Up Again: The Art of Staying Calm When Systems Crash,Alon Kiriati,Talk
+Friday,10:20,11:20,1,The Evolution of Security Attacks and Threats,Niall Merrigan,Talk
+Friday,10:20,11:20,2,Modern Observability: Making OpenTelemetry work for you,Martin Thwaites,Talk
+Friday,10:20,11:20,3,The Developer Rhapsody,Tobias Modig,Talk
+Friday,10:20,11:20,5,FinOps for Engineers: Why Your Architecture Has a Price Tag,Yihui Xu,Talk
+Friday,10:20,11:20,6,Mastering real-time anomaly detection with open source tools,Olena Kutsenko,Talk
+Friday,11:40,12:40,1,Designers vs Developers: Who is in control here?,Lemon 🍋,Talk
+Friday,11:40,12:40,2,If only I had known ...,Hannes Lowette,Talk
+Friday,11:40,12:40,4,Part 2/2: Create Your AI Product Coach: A Hands-on Workshop for Writing Impactful User Stories,Kinga Magyar,Talk
+Friday,11:40,12:40,5,One Source to Rule Them All: Kotlin DSLs as a Single Source of Truth for Multiple Tasks,Ivan Ponomarev,Talk
+Friday,11:40,12:40,6,Lightning Talks 3,Avishag Sahar,Talk
+Friday,13:40,14:40,1,How we built an AI-powered code reviewer in 80 hours,Yan Cui,Talk
+Friday,13:40,14:40,2,OpenTelemetry in a Brownfield World,Jimmy Bogard,Talk
+Friday,13:40,14:40,3,Edge-native applications - what happened to cloud-native?,Mikkel Mørk Hegnhøj,Talk
+Friday,13:40,14:40,5,Building your own AI Agent using Semantic Kernel,Johnny Hooyberghs,Talk
+Friday,13:40,14:40,6,Exploring the World of Remix: A Guide to Building Resilient and Performant Web Apps,Aurora Scharff,Talk
+Friday,15:00,16:00,1,Facilitate You! - Use your facilitating skills to lead yourself,Martin Mazur,Talk
+Friday,15:00,16:00,2,Flying a drone with gestures, bananas & Web APIs,Nhlanhla Lucky Nkosi,Talk
+Friday,15:00,16:00,3,Avoiding common pitfalls with async/await,Stephen Cleary,Talk
+Friday,15:00,16:00,5,I built an app that gives me bad advice - and it's in Jira,Lars Klint,Talk
+Friday,15:00,16:00,6,Toxic Trust: The Psychology of Automation Bias in Generative AI,Matthijs van der Veer,Talk
+Friday,16:20,17:20,1,Locknote: How ChatGPT Happened: A Brief History of AI,Rendle .,Talk
+

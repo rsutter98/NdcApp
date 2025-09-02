@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:NdcApp.Converters"
+             x:Class="NdcApp.ConferencePlanPage">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:SelectedTextConverter x:Key="SelectedTextConverter" />
+            <converters:SelectedColorConverter x:Key="SelectedColorConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <Color x:Key="NdcPrimary">#0A2342</Color>
+            <Color x:Key="NdcAccent">#FFB400</Color>
+            <Color x:Key="NdcSecondary">#FFFFFF</Color>
+            <Style x:Key="NdcHeadline" TargetType="Label">
+                <Setter Property="FontSize" Value="28" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource NdcAccent}" />
+            </Style>
+            <Style x:Key="NdcCard" TargetType="Frame">
+                <Setter Property="BackgroundColor" Value="{StaticResource NdcPrimary}" />
+                <Setter Property="BorderColor" Value="{StaticResource NdcAccent}" />
+                <Setter Property="CornerRadius" Value="16" />
+                <Setter Property="HasShadow" Value="True" />
+            </Style>
+            <Style x:Key="NdcTalkTitle" TargetType="Label">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource NdcAccent}" />
+            </Style>
+            <Style x:Key="NdcTalkSpeaker" TargetType="Label">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Italic" />
+                <Setter Property="TextColor" Value="{StaticResource NdcSecondary}" />
+            </Style>
+            <Style x:Key="NdcTalkInfo" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="TextColor" Value="{StaticResource NdcSecondary}" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource NdcAccent}" />
+                <Setter Property="TextColor" Value="{StaticResource NdcPrimary}" />
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ScrollView>
+        <VerticalStackLayout Padding="0" Spacing="0" BackgroundColor="{StaticResource NdcPrimary}">
+            <Label Text="Conference Plan" Style="{StaticResource NdcHeadline}" Margin="20,30,20,10" />
+            <HorizontalStackLayout Margin="20,10,20,0" Spacing="10">
+                <Button x:Name="ShowAllBtn" Text="Alle Talks" Clicked="OnShowAllClicked" />
+                <Button x:Name="ShowSelectedBtn" Text="Meine Talks" Clicked="OnShowSelectedClicked" />
+                <Picker x:Name="SortPicker" Title="Sortieren" SelectedIndexChanged="OnSortPickerChanged">
+                    <Picker.ItemsSource>
+                        <x:Array Type="x:String">
+                            <x:String>Standard</x:String>
+                            <x:String>Presenter</x:String>
+                            <x:String>Category</x:String>
+                        </x:Array>
+                    </Picker.ItemsSource>
+                </Picker>
+            </HorizontalStackLayout>
+            <CollectionView x:Name="TalksCollectionView" Margin="10">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Stroke="{StaticResource NdcAccent}" Background="{StaticResource NdcPrimary}" StrokeThickness="2" Margin="0,10" Padding="10" StrokeShape="Rectangle" >
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Talk.Title}" Style="{StaticResource NdcTalkTitle}" />
+                                <Label Text="{Binding Talk.Speaker}" Style="{StaticResource NdcTalkSpeaker}" />
+                                <Label Text="{Binding Talk.Day}" Style="{StaticResource NdcTalkInfo}" />
+                                <Label Text="{Binding Talk.StartTime}" Style="{StaticResource NdcTalkInfo}" />
+                                <Button 
+                                    Text="{Binding IsSelected, Converter={StaticResource SelectedTextConverter}}"
+                                    BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedColorConverter}}"
+                                    CommandParameter="{Binding .}"
+                                    Clicked="OnSelectTalk"
+                                    IsVisible="{Binding IsSelected, Converter={StaticResource InverseBoolConverter}}" />
+                                <Button 
+                                    Text="Deselect"
+                                    BackgroundColor="{StaticResource NdcAccent}"
+                                    TextColor="{StaticResource NdcPrimary}"
+                                    CommandParameter="{Binding .}"
+                                    Clicked="OnDeselectTalk"
+                                    IsVisible="{Binding IsSelected}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

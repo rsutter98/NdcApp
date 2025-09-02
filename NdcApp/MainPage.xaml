@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NdcApp.MainPage">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="NdcPrimary">#0A2342</Color>
+            <Color x:Key="NdcAccent">#FFB400</Color>
+            <Color x:Key="NdcSecondary">#FFFFFF</Color>
+            <Style x:Key="NdcHeadline" TargetType="Label">
+                <Setter Property="FontSize" Value="32" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource NdcAccent}" />
+            </Style>
+            <Style x:Key="NdcSubHeadline" TargetType="Label">
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource NdcSecondary}" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource NdcAccent}" />
+                <Setter Property="TextColor" Value="{StaticResource NdcPrimary}" />
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ScrollView>
+        <VerticalStackLayout Padding="0" Spacing="0" BackgroundColor="{StaticResource NdcPrimary}">
+            <Image Source="dotnet_bot.png" HeightRequest="120" Aspect="AspectFit" Margin="0,30,0,10" />
+            <Label Text="NDC Copenhagen" Style="{StaticResource NdcHeadline}" Margin="20,0,20,10" />
+            <Label Text="Experience the future of software!" Style="{StaticResource NdcSubHeadline}" Margin="20,0,20,20" />
+            <Frame BackgroundColor="{StaticResource NdcAccent}" CornerRadius="16" Padding="20" Margin="20,0">
+                <VerticalStackLayout>
+                    <Label x:Name="CurrentTimeLabel" Text="Current Time: 09:00" FontSize="16" TextColor="{StaticResource NdcPrimary}" />
+                    <Label x:Name="NextTalkLabel" Text="Next Talk: Keynote: AI is having its moment ... again" FontSize="16" TextColor="{StaticResource NdcPrimary}" />
+                </VerticalStackLayout>
+            </Frame>
+            <Button Text="Go to My Conference Plan" Margin="20,30,20,0" Clicked="OnConferencePlanClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

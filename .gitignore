@@ -1,0 +1,43 @@
+# Ignore build output
+bin/
+obj/
+# Ignore user-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+# Ignore Rider/VSCode/VS config
+.idea/
+.vscode/
+*.vs/
+# Ignore Mac/Windows system files
+.DS_Store
+Thumbs.db
+# Ignore logs
+*.log
+# Ignore generated files
+*.g.dart
+*.g.cs
+# Ignore NuGet packages
+*.nupkg
+# Ignore test results
+TestResults/
+# Ignore other temp files
+*.tmp
+*.bak
+# Ignore app publish output
+publish/
+# Ignore Maui build artifacts
+*.apk
+*.aab
+*.ipa
+*.app
+*.xcarchive
+*.dll
+*.exe
+*.pdb
+*.cache
+*.db
+*.lock
+# Ignore CSV in Raw if not needed
+Resources/Raw/*.csv
