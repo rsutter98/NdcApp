@@ -1,0 +1,23 @@
+{
+  "name": "ndcapp-issue-generator",
+  "version": "1.0.0",
+  "description": "GitHub Issue Generator für NdcApp Roadmap",
+  "main": "generate-issues.js",
+  "scripts": {
+    "generate": "node generate-issues.js",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "author": "NdcApp Team",
+  "license": "MIT",
+  "dependencies": {},
+  "bin": {
+    "generate-issues": "./generate-issues.js"
+  },
+  "keywords": [
+    "github",
+    "issues",
+    "roadmap",
+    "ndcapp",
+    "automation"
+  ]
+}
