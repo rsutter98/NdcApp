@@ -10,6 +10,8 @@ namespace NdcApp
 {
     public partial class ConferencePlanPage : ContentPage
     {
+        private const string SELECTED_TALKS_PREFERENCE_KEY = "SelectedTalks";
+        
         private List<Talk> allTalks = new();
         private Dictionary<string, Talk> selectedTalks = new(); // key: "Day|StartTime"
         private bool showAll = true;
@@ -50,7 +52,7 @@ namespace NdcApp
 
         private void LoadSelectedTalks()
         {
-            var selectedTalksRaw = Preferences.Default.Get("SelectedTalks", "");
+            var selectedTalksRaw = Preferences.Default.Get(SELECTED_TALKS_PREFERENCE_KEY, "");
             selectedTalks.Clear();
             if (!string.IsNullOrEmpty(selectedTalksRaw))
             {
@@ -126,7 +128,7 @@ namespace NdcApp
                 var key = $"{talk.Day}|{talk.StartTime}";
                 selectedTalks[key] = talk;
                 // Save selected talks persistently
-                Preferences.Default.Set("SelectedTalks", string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
+                Preferences.Default.Set(SELECTED_TALKS_PREFERENCE_KEY, string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
                 RefreshTalksView();
                 DisplayAlert("Selected", $"Selected: {talk.Title}", "OK");
             }
@@ -141,7 +143,7 @@ namespace NdcApp
                 if (selectedTalks.ContainsKey(key))
                 {
                     selectedTalks.Remove(key);
-                    Preferences.Default.Set("SelectedTalks", string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
+                    Preferences.Default.Set(SELECTED_TALKS_PREFERENCE_KEY, string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
                     ShowSelectedTalksOnly();
                 }
             }

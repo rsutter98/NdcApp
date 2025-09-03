@@ -51,7 +51,7 @@ namespace NdcApp.Tests
             var service = CreateService();
 
             // Act
-            service.SelectTalk(null);
+            service.SelectTalk(null!);
 
             // Assert
             Assert.Empty(service.GetSelectedTalks());
@@ -82,7 +82,7 @@ namespace NdcApp.Tests
             service.SelectTalk(talk);
 
             // Act
-            service.DeselectTalk(null);
+            service.DeselectTalk(null!);
 
             // Assert
             Assert.Single(service.GetSelectedTalks());
@@ -109,7 +109,7 @@ namespace NdcApp.Tests
             var service = CreateService();
 
             // Act
-            var result = service.IsTalkSelected(null);
+            var result = service.IsTalkSelected(null!);
 
             // Assert
             Assert.False(result);
@@ -268,7 +268,7 @@ namespace NdcApp.Tests
             service.SelectTalk(CreateTestTalk());
 
             // Act
-            service.DeserializeSelectedTalks(null);
+            service.DeserializeSelectedTalks(null!);
 
             // Assert
             Assert.Empty(service.GetSelectedTalks());

@@ -124,9 +124,9 @@ Thursday,14:00,15:00,3,Advanced C# Workshop,John Smith,Workshop";
             var service = new ConferencePlanService();
 
             // Test null talk handling
-            service.SelectTalk(null);
-            service.DeselectTalk(null);
-            Assert.False(service.IsTalkSelected(null));
+            service.SelectTalk(null!);
+            service.DeselectTalk(null!);
+            Assert.False(service.IsTalkSelected(null!));
             Assert.Empty(service.GetSelectedTalks());
 
             // Test empty serialization
