@@ -9,6 +9,8 @@ namespace NdcApp;
 
 public partial class MainPage : ContentPage
 {
+    private const string SELECTED_TALKS_PREFERENCE_KEY = "SelectedTalks";
+    
     public MainPage()
     {
         InitializeComponent();
@@ -35,7 +37,7 @@ public partial class MainPage : ContentPage
     private void ShowNextSelectedTalk()
     {
         // Load selected talks from Preferences
-        var selectedTalksRaw = Preferences.Default.Get("SelectedTalks", "");
+        var selectedTalksRaw = Preferences.Default.Get(SELECTED_TALKS_PREFERENCE_KEY, "");
         if (string.IsNullOrEmpty(selectedTalksRaw))
         {
             NextTalkLabel.Text = "No talk selected.";
