@@ -11,7 +11,7 @@ namespace NdcApp.Tests
     {
         private ConferencePlanService CreateService()
         {
-            return new ConferencePlanService();
+            return new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
         }
 
         private Talk CreateTestTalk(string day = "Wednesday", string startTime = "09:00", string endTime = "10:00", 

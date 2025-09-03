@@ -17,7 +17,7 @@ namespace NdcApp.Tests
         public TalkNotificationServiceTests()
         {
             _mockNotificationService = new MockNotificationService();
-            _conferencePlanService = new ConferencePlanService();
+            _conferencePlanService = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
             _notificationService = new TalkNotificationService(_mockNotificationService, _conferencePlanService);
         }
 

@@ -8,6 +8,7 @@ namespace NdcApp.Tests
 {
     public class TalkFilterServiceTests
     {
+        private readonly TalkFilterService _filterService = new TalkFilterService();
         private readonly List<Talk> testTalks = new List<Talk>
         {
             new Talk
@@ -46,7 +47,7 @@ namespace NdcApp.Tests
         public void FilterTalks_EmptySearchText_ReturnsAllTalks()
         {
             // Act
-            var result = TalkFilterService.FilterTalks(testTalks, "");
+            var result = _filterService.FilterTalks(testTalks, "");
 
             // Assert
             Assert.Equal(3, result.Count);
@@ -57,7 +58,7 @@ namespace NdcApp.Tests
         public void FilterTalks_NullSearchText_ReturnsAllTalks()
         {
             // Act
-            var result = TalkFilterService.FilterTalks(testTalks, null!);
+            var result = _filterService.FilterTalks(testTalks, null!);
 
             // Assert
             Assert.Equal(3, result.Count);
@@ -68,7 +69,7 @@ namespace NdcApp.Tests
         public void FilterTalks_SearchByTitle_ReturnsMatchingTalks()
         {
             // Act
-            var result = TalkFilterService.FilterTalks(testTalks, "AI");
+            var result = _filterService.FilterTalks(testTalks, "AI");
 
             // Assert
             Assert.Single(result);
@@ -79,7 +80,7 @@ namespace NdcApp.Tests
         public void FilterTalks_SearchBySpeaker_ReturnsMatchingTalks()
         {
             // Act
-            var result = TalkFilterService.FilterTalks(testTalks, "Jodie");
+            var result = _filterService.FilterTalks(testTalks, "Jodie");
 
             // Assert
             Assert.Single(result);
@@ -90,7 +91,7 @@ namespace NdcApp.Tests
         public void FilterTalks_SearchByCategory_ReturnsMatchingTalks()
         {
             // Act
-            var result = TalkFilterService.FilterTalks(testTalks, "Cloud");
+            var result = _filterService.FilterTalks(testTalks, "Cloud");
 
             // Assert
             Assert.Single(result);
@@ -101,7 +102,7 @@ namespace NdcApp.Tests
         public void FilterTalks_SearchByRoom_ReturnsMatchingTalks()
         {
             // Act
-            var result = TalkFilterService.FilterTalks(testTalks, "Room 2");
+            var result = _filterService.FilterTalks(testTalks, "Room 2");
 
             // Assert
             Assert.Single(result);
@@ -112,7 +113,7 @@ namespace NdcApp.Tests
         public void FilterTalks_CaseInsensitiveSearch_ReturnsMatchingTalks()
         {
             // Act
-            var result = TalkFilterService.FilterTalks(testTalks, "java");
+            var result = _filterService.FilterTalks(testTalks, "java");
 
             // Assert
             Assert.Single(result);
@@ -123,7 +124,7 @@ namespace NdcApp.Tests
         public void FilterTalks_NoMatch_ReturnsEmptyList()
         {
             // Act
-            var result = TalkFilterService.FilterTalks(testTalks, "NonExistentTerm");
+            var result = _filterService.FilterTalks(testTalks, "NonExistentTerm");
 
             // Assert
             Assert.Empty(result);
@@ -133,7 +134,7 @@ namespace NdcApp.Tests
         public void FilterTalks_PartialMatch_ReturnsMatchingTalks()
         {
             // Act
-            var result = TalkFilterService.FilterTalks(testTalks, "future");
+            var result = _filterService.FilterTalks(testTalks, "future");
 
             // Assert
             Assert.Single(result);

@@ -10,11 +10,18 @@ namespace NdcApp.Tests
 {
     public class TalkServiceTests
     {
+        private readonly TalkService _talkService;
         private readonly string testCsvContent = @"Datum,Startzeit,Endzeit,Raum,Titel,Speaker,Kategorie
 Wednesday,09:00,10:00,1,Keynote: AI is having its moment ... again,Jodie Burchell,Talk
 Wednesday,10:20,11:20,1,Java Sucks (So C# Didn't Have To),Adele Carpenter,Talk
 Wednesday,10:20,11:20,2,Navigating complexity in event-driven architectures,David Boyne,Talk
 Thursday,14:00,15:00,3,The future & challenges of cloud,Anders Lybecker,Workshop";
+
+        public TalkServiceTests()
+        {
+            var mockLogger = new Mocks.MockLoggerService();
+            _talkService = new TalkService(mockLogger);
+        }
 
         [Fact]
         public void LoadTalks_FileNotFound_ThrowsFileNotFoundException()
@@ -23,7 +30,7 @@ Thursday,14:00,15:00,3,The future & challenges of cloud,Anders Lybecker,Workshop
             var nonExistentPath = "/path/that/does/not/exist.csv";
 
             // Act & Assert
-            Assert.Throws<FileNotFoundException>(() => TalkService.LoadTalks(nonExistentPath));
+            Assert.Throws<FileNotFoundException>(() => _talkService.LoadTalks(nonExistentPath));
         }
 
         [Fact]
@@ -36,7 +43,7 @@ Thursday,14:00,15:00,3,The future & challenges of cloud,Anders Lybecker,Workshop
             try
             {
                 // Act
-                var talks = TalkService.LoadTalks(tempFile);
+                var talks = _talkService.LoadTalks(tempFile);
 
                 // Assert
                 Assert.Equal(4, talks.Count);
@@ -60,7 +67,7 @@ Thursday,14:00,15:00,3,The future & challenges of cloud,Anders Lybecker,Workshop
         public void ParseTalksFromString_ValidCsvContent_ReturnsParsedTalks()
         {
             // Act
-            var talks = TalkService.ParseTalksFromString(testCsvContent);
+            var talks = _talkService.ParseTalksFromString(testCsvContent);
 
             // Assert
             Assert.Equal(4, talks.Count);
@@ -79,7 +86,7 @@ Thursday,14:00,15:00,3,The future & challenges of cloud,Anders Lybecker,Workshop
         public void ParseTalksFromString_EmptyContent_ReturnsEmptyList()
         {
             // Act
-            var talks = TalkService.ParseTalksFromString("");
+            var talks = _talkService.ParseTalksFromString("");
 
             // Assert
             Assert.Empty(talks);
@@ -92,7 +99,7 @@ Thursday,14:00,15:00,3,The future & challenges of cloud,Anders Lybecker,Workshop
             var headerOnly = "Datum,Startzeit,Endzeit,Raum,Titel,Speaker,Kategorie";
 
             // Act
-            var talks = TalkService.ParseTalksFromString(headerOnly);
+            var talks = _talkService.ParseTalksFromString(headerOnly);
 
             // Assert
             Assert.Empty(talks);
@@ -109,7 +116,7 @@ Wednesday,invalid_time,11:00,2,Another Valid Talk,Speaker B,Talk
 TooFewColumns,Only,Three";
 
             // Act
-            var talks = TalkService.ParseTalksFromString(invalidCsv);
+            var talks = _talkService.ParseTalksFromString(invalidCsv);
 
             // Assert
             Assert.Single(talks); // Only one valid talk should be parsed
@@ -120,7 +127,7 @@ TooFewColumns,Only,Three";
         public void ParseTalksFromString_AllValidData_ParsesCorrectly()
         {
             // Act
-            var talks = TalkService.ParseTalksFromString(testCsvContent);
+            var talks = _talkService.ParseTalksFromString(testCsvContent);
 
             // Assert
             Assert.All(talks, talk =>
@@ -143,7 +150,7 @@ TooFewColumns,Only,Three";
             var csvWithHeader = $"Datum,Startzeit,Endzeit,Raum,Titel,Speaker,Kategorie\n{csvLine}";
 
             // Act
-            var talks = TalkService.ParseTalksFromString(csvWithHeader);
+            var talks = _talkService.ParseTalksFromString(csvWithHeader);
 
             // Assert
             Assert.Single(talks);

@@ -7,6 +7,13 @@ namespace NdcApp.Tests
 {
     public class ActualDataTests
     {
+        private readonly TalkService _talkService;
+
+        public ActualDataTests()
+        {
+            var mockLogger = new Mocks.MockLoggerService();
+            _talkService = new TalkService(mockLogger);
+        }
         [Fact]
         public void LoadActualNdcCsvFile_IfExists_LoadsCorrectly()
         {
@@ -35,14 +42,14 @@ namespace NdcApp.Tests
                 var testContent = @"Datum,Startzeit,Endzeit,Raum,Titel,Speaker,Kategorie
 Wednesday,09:00,10:00,1,Keynote: AI is having its moment ... again,Jodie Burchell,Talk";
                 
-                var talks = TalkService.ParseTalksFromString(testContent);
+                var talks = _talkService.ParseTalksFromString(testContent);
                 Assert.Single(talks);
                 Assert.Equal("Wednesday", talks[0].Day);
                 return;
             }
 
             // Act - Load the actual CSV file
-            var actualTalks = TalkService.LoadTalks(actualCsvPath);
+            var actualTalks = _talkService.LoadTalks(actualCsvPath);
 
             // Assert - Verify the data structure is correct
             Assert.NotEmpty(actualTalks);
@@ -81,10 +88,10 @@ Wednesday,10:20,11:20,1,Java Sucks (So C# Didn't Have To),Adele Carpenter,Talk
 Wednesday,10:20,11:20,2,Navigating complexity in event-driven architectures: A domain-driven approach,David Boyne,Talk
 Wednesday,10:20,11:20,2,The future & challenges of cloud,Anders Lybecker,Talk";
 
-            var service = new ConferencePlanService();
+            var service = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
 
             // Act
-            var talks = TalkService.ParseTalksFromString(knownNdcData);
+            var talks = _talkService.ParseTalksFromString(knownNdcData);
             
             // Test selection of conflicting talks (same time slot)
             service.SelectTalk(talks[1]); // Java talk at 10:20 in room 1

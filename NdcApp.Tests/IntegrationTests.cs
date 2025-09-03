@@ -10,6 +10,13 @@ namespace NdcApp.Tests
 {
     public class IntegrationTests
     {
+        private readonly TalkService _talkService;
+
+        public IntegrationTests()
+        {
+            var mockLogger = new Mocks.MockLoggerService();
+            _talkService = new TalkService(mockLogger);
+        }
         [Fact]
         public void FullWorkflow_LoadSelectSortAndPersist_WorksCorrectly()
         {
@@ -21,10 +28,10 @@ Wednesday,10:20,11:20,2,Navigating complexity in event-driven architectures,Davi
 Thursday,09:00,10:00,1,Opening Keynote,Jane Doe,Keynote
 Thursday,14:00,15:00,3,Advanced C# Workshop,John Smith,Workshop";
 
-            var service = new ConferencePlanService();
+            var service = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
 
             // Act 1: Load talks from CSV content
-            var talks = TalkService.ParseTalksFromString(testCsvContent);
+            var talks = _talkService.ParseTalksFromString(testCsvContent);
             
             // Act 2: Select some talks
             service.SelectTalk(talks[0]); // Wednesday 09:00 Keynote
@@ -38,7 +45,7 @@ Thursday,14:00,15:00,3,Advanced C# Workshop,John Smith,Workshop";
 
             // Act 4: Serialize and deserialize selected talks
             var serialized = service.SerializeSelectedTalks();
-            var newService = new ConferencePlanService();
+            var newService = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
             newService.DeserializeSelectedTalks(serialized);
 
             // Assert: Verify CSV loading
@@ -81,7 +88,7 @@ Thursday,14:00,15:00,3,Advanced C# Workshop,John Smith,Workshop";
         public void TimeConflictHandling_SameDayAndTime_ReplacesSelection()
         {
             // Arrange
-            var service = new ConferencePlanService();
+            var service = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
             var talk1 = new Talk
             {
                 Day = "Wednesday",
@@ -121,7 +128,7 @@ Thursday,14:00,15:00,3,Advanced C# Workshop,John Smith,Workshop";
         public void EdgeCaseHandling_EmptyAndInvalidData_HandledGracefully()
         {
             // Arrange
-            var service = new ConferencePlanService();
+            var service = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
 
             // Test null talk handling
             service.SelectTalk(null!);
@@ -138,7 +145,7 @@ Invalid,Line,With,Too,Few
 Wednesday,invalid_time,10:00,1,Title,Speaker,Category
 ,,,,,";
 
-            var talks = TalkService.ParseTalksFromString(invalidCsv);
+            var talks = _talkService.ParseTalksFromString(invalidCsv);
             Assert.Empty(talks); // Should gracefully handle all invalid lines
         }
 
@@ -176,8 +183,8 @@ Tuesday,14:00,16:00,Lab,Hands-on Coding,Code Mentor,Workshop
 Wednesday,09:00,10:00,Main,Future of Technology,Tech Visionary,Keynote
 Wednesday,15:00,16:00,Room1,Panel Discussion,Various Speakers,Panel";
 
-            var service = new ConferencePlanService();
-            var talks = TalkService.ParseTalksFromString(conferenceData);
+            var service = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
+            var talks = _talkService.ParseTalksFromString(conferenceData);
 
             // Act - User selects their conference schedule
             // Select keynotes from each day
@@ -208,7 +215,7 @@ Wednesday,15:00,16:00,Room1,Panel Discussion,Various Speakers,Panel";
             Assert.Contains("Hands-on Coding", serialized);
 
             // Verify restoration
-            var newService = new ConferencePlanService();
+            var newService = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
             newService.DeserializeSelectedTalks(serialized);
             Assert.Equal(4, newService.GetSelectedTalks().Count);
         }

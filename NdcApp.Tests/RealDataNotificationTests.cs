@@ -14,7 +14,7 @@ namespace NdcApp.Tests
         {
             // Arrange - Use real talk data from CSV
             var mockNotificationService = new MockNotificationService();
-            var conferencePlanService = new ConferencePlanService();
+            var conferencePlanService = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
             var talkNotificationService = new TalkNotificationService(mockNotificationService, conferencePlanService);
 
             var realTalk = new Talk
@@ -58,7 +58,7 @@ namespace NdcApp.Tests
         {
             // Arrange - Two talks at same time slot (should conflict)
             var mockNotificationService = new MockNotificationService();
-            var conferencePlanService = new ConferencePlanService();
+            var conferencePlanService = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
             var talkNotificationService = new TalkNotificationService(mockNotificationService, conferencePlanService);
 
             var talk1 = new Talk

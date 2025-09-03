@@ -14,7 +14,7 @@ namespace NdcApp.Tests
         {
             // Arrange
             var mockNotificationService = new MockNotificationService();
-            var conferencePlanService = new ConferencePlanService();
+            var conferencePlanService = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
             var talkNotificationService = new TalkNotificationService(mockNotificationService, conferencePlanService);
 
             // Create a sample talk
@@ -56,7 +56,7 @@ namespace NdcApp.Tests
         {
             // Arrange
             var mockNotificationService = new MockNotificationService();
-            var conferencePlanService = new ConferencePlanService();
+            var conferencePlanService = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
             var talkNotificationService = new TalkNotificationService(mockNotificationService, conferencePlanService);
 
             var talk1 = new Talk
@@ -105,7 +105,7 @@ namespace NdcApp.Tests
         {
             // Arrange
             var mockNotificationService = new MockNotificationService();
-            var conferencePlanService = new ConferencePlanService();
+            var conferencePlanService = new ConferencePlanService(new TalkRatingService(), new Mocks.MockLoggerService());
             var talkNotificationService = new TalkNotificationService(mockNotificationService, conferencePlanService);
 
             var now = DateTime.Now.TimeOfDay;
