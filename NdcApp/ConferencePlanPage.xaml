@@ -66,6 +66,7 @@
                             <x:String>Standard</x:String>
                             <x:String>Presenter</x:String>
                             <x:String>Category</x:String>
+                            <x:String>Rating</x:String>
                         </x:Array>
                     </Picker.ItemsSource>
                 </Picker>
@@ -93,6 +94,10 @@
                                     <VerticalStackLayout>
                                         <Label Text="{Binding Talk.Title}" Style="{StaticResource NdcTalkTitle}" />
                                         <Label Text="{Binding Talk.Speaker}" Style="{StaticResource NdcTalkSpeaker}" />
+                                        <Label Text="{Binding RatingDisplay}" 
+                                               Style="{StaticResource NdcTalkInfo}" 
+                                               TextColor="{StaticResource NdcAccent}"
+                                               IsVisible="{Binding HasRating}" />
                                         <Label Text="{Binding Talk.Day}" Style="{StaticResource NdcTalkInfo}" />
                                         <Label Text="{Binding Talk.StartTime}" Style="{StaticResource NdcTalkInfo}" />
                                         <Button 

@@ -363,6 +363,34 @@ namespace NdcApp
             }
         }
 
+        private void SortByRating()
+        {
+            if (showAll)
+            {
+                var filteredTalks = FilterTalks(allTalks);
+                var sorted = filteredTalks
+                    .OrderByDescending(t => t.AverageRating)
+                    .ThenByDescending(t => t.RatingCount)
+                    .Select(t => new TalkDisplayItem {
+                        Talk = t,
+                        IsSelected = selectedTalks.ContainsKey($"{t.Day}|{t.StartTime}") && selectedTalks[$"{t.Day}|{t.StartTime}"].Title == t.Title
+                    })
+                    .ToList();
+                TalksCollectionView.ItemsSource = sorted;
+            }
+            else
+            {
+                var selectedTalksList = selectedTalks.Values.ToList();
+                var filteredSelected = FilterTalks(selectedTalksList);
+                var sorted = filteredSelected
+                    .OrderByDescending(t => t.AverageRating)
+                    .ThenByDescending(t => t.RatingCount)
+                    .Select(t => new TalkDisplayItem { Talk = t, IsSelected = true })
+                    .ToList();
+                TalksCollectionView.ItemsSource = sorted;
+            }
+        }
+
         private async void OnNotificationsClicked(object sender, EventArgs e)
         {
             if (_notificationService == null)
@@ -413,6 +441,10 @@ namespace NdcApp
             {
                 SortByCategory();
             }
+            else if (SortPicker.SelectedIndex == 3) // Rating
+            {
+                SortByRating();
+            }
             else // Standard
             {
                 if (showAll)
@@ -427,5 +459,12 @@ namespace NdcApp
     {
         public Talk Talk { get; set; } = new Talk();
         public bool IsSelected { get; set; }
+        
+        // Computed properties for display
+        public string RatingDisplay => Talk.RatingCount > 0 
+            ? $"★ {Talk.AverageRating:F1} ({Talk.RatingCount})" 
+            : "No ratings";
+        
+        public bool HasRating => Talk.RatingCount > 0;
     }
 }
