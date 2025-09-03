@@ -72,9 +72,10 @@
                 </Picker>
             </HorizontalStackLayout>
             <RefreshView x:Name="RefreshViewControl" Refreshing="OnRefresh">
-                <CollectionView x:Name="TalksCollectionView" Margin="10">
+                <CollectionView x:Name="TalksCollectionView" Margin="10"
+                               SelectionMode="None">
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="{x:Type local:TalkDisplayItem}">
+                        <DataTemplate x:DataType="local:TalkDisplayItem">
                             <SwipeView>
                                 <SwipeView.RightItems>
                                     <SwipeItems>

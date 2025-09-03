@@ -17,7 +17,7 @@ namespace NdcApp.Core.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public void SelectTalk(Talk talk)
+        public void SelectTalk(Talk? talk)
         {
             if (talk == null) return;
             var key = $"{talk.Day}|{talk.StartTime}";
@@ -25,7 +25,7 @@ namespace NdcApp.Core.Services
             _logger.LogInfo($"Talk selected: {talk.Title} by {talk.Speaker}");
         }
 
-        public void DeselectTalk(Talk talk)
+        public void DeselectTalk(Talk? talk)
         {
             if (talk == null) return;
             var key = $"{talk.Day}|{talk.StartTime}";
@@ -33,7 +33,7 @@ namespace NdcApp.Core.Services
             _logger.LogInfo($"Talk deselected: {talk.Title} by {talk.Speaker}");
         }
 
-        public bool IsTalkSelected(Talk talk)
+        public bool IsTalkSelected(Talk? talk)
         {
             if (talk == null) return false;
             var key = $"{talk.Day}|{talk.StartTime}";
@@ -56,7 +56,7 @@ namespace NdcApp.Core.Services
                 $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category},{t.AverageRating},{t.RatingCount}"));
         }
 
-        public void DeserializeSelectedTalks(string serializedTalks)
+        public void DeserializeSelectedTalks(string? serializedTalks)
         {
             selectedTalks.Clear();
             if (string.IsNullOrEmpty(serializedTalks)) return;
@@ -144,13 +144,15 @@ namespace NdcApp.Core.Services
             return _ratingService.GetRecommendations(talks, maxRecommendations);
         }
 
-        public void RateTalk(Talk talk, int rating, string comment = "")
+        public void RateTalk(Talk? talk, int rating, string comment = "")
         {
+            if (talk == null) return;
             _ratingService.RateTalk(talk.Id, rating, comment);
         }
 
-        public List<TalkRating> GetRatingsForTalk(Talk talk)
+        public List<TalkRating> GetRatingsForTalk(Talk? talk)
         {
+            if (talk == null) return new List<TalkRating>();
             return _ratingService.GetRatingsForTalk(talk.Id);
         }
 
