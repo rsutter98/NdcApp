@@ -1,7 +1,7 @@
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
-using NdcApp.Models;
-using NdcApp.Services;
+using NdcApp.Core.Models;
+using NdcApp.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +15,7 @@ namespace NdcApp
         private List<Talk> allTalks = new();
         private Dictionary<string, Talk> selectedTalks = new(); // key: "Day|StartTime"
         private bool showAll = true;
+        private string searchText = string.Empty;
 
         public ConferencePlanPage()
         {
@@ -95,8 +96,12 @@ namespace NdcApp
                 ShowSelectedTalksOnly();
                 return;
             }
+            
+            // Apply search filter first
+            var filteredTalks = FilterTalks(allTalks);
+            
             // Group talks by day and time slot
-            var grouped = allTalks
+            var grouped = filteredTalks
                 .GroupBy(t => new { t.Day, t.StartTime })
                 .OrderBy(g => g.Key.Day)
                 .ThenBy(g => g.Key.StartTime)
@@ -149,6 +154,66 @@ namespace NdcApp
             }
         }
 
+        private void OnSwipeSelectTalk(object sender, EventArgs e)
+        {
+            if (sender is SwipeItem swipeItem && swipeItem.CommandParameter is TalkDisplayItem item)
+            {
+                var talk = item.Talk;
+                var key = $"{talk.Day}|{talk.StartTime}";
+                selectedTalks[key] = talk;
+                // Save selected talks persistently
+                Preferences.Default.Set(SELECTED_TALKS_PREFERENCE_KEY, string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
+                RefreshTalksView();
+                DisplayAlert("Selected", $"Selected: {talk.Title}", "OK");
+            }
+        }
+
+        private void OnSwipeDeselectTalk(object sender, EventArgs e)
+        {
+            if (sender is SwipeItem swipeItem && swipeItem.CommandParameter is TalkDisplayItem item)
+            {
+                var talk = item.Talk;
+                var key = $"{talk.Day}|{talk.StartTime}";
+                if (selectedTalks.ContainsKey(key))
+                {
+                    selectedTalks.Remove(key);
+                    Preferences.Default.Set(SELECTED_TALKS_PREFERENCE_KEY, string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
+                    RefreshTalksView();
+                    DisplayAlert("Deselected", $"Deselected: {talk.Title}", "OK");
+                }
+            }
+        }
+
+        private void OnRefresh(object sender, EventArgs e)
+        {
+            // Reload talks from CSV
+            LoadTalks();
+            // Reload selected talks from preferences
+            LoadSelectedTalks();
+            // Refresh the current view
+            if (showAll)
+                RefreshTalksView();
+            else
+                ShowSelectedTalksOnly();
+            
+            // Stop the refresh indicator
+            RefreshViewControl.IsRefreshing = false;
+        }
+
+        private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+        {
+            searchText = e.NewTextValue ?? string.Empty;
+            if (showAll)
+                RefreshTalksView();
+            else
+                ShowSelectedTalksOnly();
+        }
+
+        private List<Talk> FilterTalks(List<Talk> talks)
+        {
+            return TalkFilterService.FilterTalks(talks, searchText);
+        }
+
         protected override void OnAppearing()
         {
             base.OnAppearing();
@@ -158,7 +223,10 @@ namespace NdcApp
 
         private void ShowSelectedTalksOnly()
         {
-            var displayList = selectedTalks.Values
+            var selectedTalksList = selectedTalks.Values.ToList();
+            var filteredSelected = FilterTalks(selectedTalksList);
+            
+            var displayList = filteredSelected
                 .OrderBy(t => t.Day)
                 .ThenBy(t => t.StartTime)
                 .Select(t => new TalkDisplayItem { Talk = t, IsSelected = true })
@@ -170,7 +238,8 @@ namespace NdcApp
         {
             if (showAll)
             {
-                var sorted = allTalks
+                var filteredTalks = FilterTalks(allTalks);
+                var sorted = filteredTalks
                     .OrderBy(t => t.Speaker)
                     .Select(t => new TalkDisplayItem {
                         Talk = t,
@@ -181,7 +250,9 @@ namespace NdcApp
             }
             else
             {
-                var sorted = selectedTalks.Values
+                var selectedTalksList = selectedTalks.Values.ToList();
+                var filteredSelected = FilterTalks(selectedTalksList);
+                var sorted = filteredSelected
                     .OrderBy(t => t.Speaker)
                     .Select(t => new TalkDisplayItem { Talk = t, IsSelected = true })
                     .ToList();
@@ -193,7 +264,8 @@ namespace NdcApp
         {
             if (showAll)
             {
-                var sorted = allTalks
+                var filteredTalks = FilterTalks(allTalks);
+                var sorted = filteredTalks
                     .OrderBy(t => t.Category)
                     .Select(t => new TalkDisplayItem {
                         Talk = t,
@@ -204,7 +276,9 @@ namespace NdcApp
             }
             else
             {
-                var sorted = selectedTalks.Values
+                var selectedTalksList = selectedTalks.Values.ToList();
+                var filteredSelected = FilterTalks(selectedTalksList);
+                var sorted = filteredSelected
                     .OrderBy(t => t.Category)
                     .Select(t => new TalkDisplayItem { Talk = t, IsSelected = true })
                     .ToList();
