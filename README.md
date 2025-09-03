@@ -1,5 +1,9 @@
 # NdcApp - Conference Planning Application
 
+[![CI/CD Pipeline](https://github.com/rsutter98/NdcApp/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/rsutter98/NdcApp/actions/workflows/ci-cd.yml)
+[![Tests](https://img.shields.io/badge/tests-99%20passing-success)](https://github.com/rsutter98/NdcApp/actions)
+[![Platform](https://img.shields.io/badge/platform-Windows%20|%20Android-lightgrey)](#-deployment)
+
 Eine .NET MAUI-Anwendung zur Planung und Verwaltung von Konferenzteilnahmen.
 
 ## 🚀 Features
@@ -392,6 +396,42 @@ Alle Talks → Suche eingeben → Filter anwenden → Ergebnisse → Auswahl tre
 - Persistierung aller Auswahlen und Bewertungen
 - Push-Notifications zur richtigen Zeit
 - Intelligente Sortierung nach Bewertungen
+
+## 📦 Deployment
+
+### Verfügbare Plattformen
+
+| Plattform | Format | Mindestversion | Status |
+|-----------|--------|----------------|--------|
+| Windows | MSIX Package | Windows 10 Build 17763 | ✅ Unterstützt |
+| Android | APK | Android 5.0 (API 21) | ✅ Unterstützt |
+
+### Installation
+
+#### Windows
+1. MSIX Package von [Releases](https://github.com/rsutter98/NdcApp/releases) herunterladen
+2. Package installieren (Developer Mode ggf. aktivieren)
+3. App aus Startmenü starten
+
+#### Android
+1. APK von [Releases](https://github.com/rsutter98/NdcApp/releases) herunterladen
+2. "Installation aus unbekannten Quellen" aktivieren
+3. APK installieren
+
+### Entwickler-Builds
+
+Für manuelle Builds und lokale Tests:
+
+```bash
+# Manuelle Deployment
+./scripts/deploy-manual.sh
+
+# Plattform-spezifische Builds (Windows erforderlich)
+dotnet publish -f net8.0-windows10.0.19041.0 -c Release
+dotnet publish -f net8.0-android -c Release
+```
+
+📖 **Vollständige Deployment-Dokumentation**: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## 📋 Bekannte Probleme
 

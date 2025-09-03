@@ -27,6 +27,8 @@ TestResults/
 *.bak
 # Ignore app publish output
 publish/
+# Ignore deployment artifacts
+dist/
 # Ignore Maui build artifacts
 *.apk
 *.aab

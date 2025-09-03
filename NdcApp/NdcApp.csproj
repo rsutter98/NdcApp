@@ -9,20 +9,34 @@
         <Nullable>enable</Nullable>
 
         <!-- Display name -->
-        <ApplicationTitle>NdcApp</ApplicationTitle>
+        <ApplicationTitle>NDC Conference Planner</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.ndcapp</ApplicationId>
+        <ApplicationId>com.ndcapp.conferenceplanner</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
 
-        <!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
-        <WindowsPackageType>None</WindowsPackageType>
+        <!-- Required for .NET MAUI Class Libraries -->
+        <UseMauiEssentials>true</UseMauiEssentials>
+        
+        <!-- Deployment optimizations -->
+        <TrimMode>copyused</TrimMode>
+        <PublishTrimmed>true</PublishTrimmed>
+        
+        <!-- Platform support -->
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+    </PropertyGroup>
 
-        <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <!-- Enable platform-specific configurations in CI/CD -->
+    <PropertyGroup>
+        <WindowsPackageType Condition="'$(CI_PLATFORM)' == 'windows'">MSIX</WindowsPackageType>
+        <AndroidMinSdkVersion Condition="'$(CI_PLATFORM)' == 'android'">21</AndroidMinSdkVersion>
+        <AndroidTargetSdkVersion Condition="'$(CI_PLATFORM)' == 'android'">34</AndroidTargetSdkVersion>
+        <AndroidCompileSdkVersion Condition="'$(CI_PLATFORM)' == 'android'">34</AndroidCompileSdkVersion>
     </PropertyGroup>
 
     <ItemGroup>
