@@ -8,6 +8,12 @@ namespace NdcApp.Core.Services
     public class ConferencePlanService
     {
         private Dictionary<string, Talk> selectedTalks = new();
+        private readonly ITalkRatingService _ratingService;
+
+        public ConferencePlanService(ITalkRatingService? ratingService = null)
+        {
+            _ratingService = ratingService ?? new TalkRatingService();
+        }
 
         public void SelectTalk(Talk talk)
         {
@@ -43,7 +49,7 @@ namespace NdcApp.Core.Services
         public string SerializeSelectedTalks()
         {
             return string.Join("|", selectedTalks.Values.Select(t => 
-                $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}"));
+                $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category},{t.AverageRating},{t.RatingCount}"));
         }
 
         public void DeserializeSelectedTalks(string serializedTalks)
@@ -53,7 +59,7 @@ namespace NdcApp.Core.Services
 
             var selected = serializedTalks.Split('|')
                 .Select(line => line.Split(','))
-                .Where(parts => parts.Length == 7)
+                .Where(parts => parts.Length >= 7) // Support both old and new format
                 .Select(parts => new Talk {
                     Day = parts[0],
                     StartTime = TimeSpan.Parse(parts[1]),
@@ -61,7 +67,9 @@ namespace NdcApp.Core.Services
                     Room = parts[3],
                     Title = parts[4],
                     Speaker = parts[5],
-                    Category = parts[6]
+                    Category = parts[6],
+                    AverageRating = parts.Length > 7 && double.TryParse(parts[7], out var rating) ? rating : 0.0,
+                    RatingCount = parts.Length > 8 && int.TryParse(parts[8], out var count) ? count : 0
                 });
 
             foreach (var talk in selected)
@@ -90,6 +98,13 @@ namespace NdcApp.Core.Services
             return talks.OrderBy(t => t.Category).ToList();
         }
 
+        public List<Talk> SortTalksByRating(List<Talk> talks)
+        {
+            return talks.OrderByDescending(t => t.AverageRating)
+                       .ThenByDescending(t => t.RatingCount)
+                       .ToList();
+        }
+
         public List<Talk> SortTalksStandard(List<Talk> talks)
         {
             // Define day order for proper chronological sorting
@@ -107,6 +122,27 @@ namespace NdcApp.Core.Services
             return talks.OrderBy(t => dayOrder.GetValueOrDefault(t.Day, 999))
                        .ThenBy(t => t.StartTime)
                        .ToList();
+        }
+
+        public List<TalkRecommendation> GetRecommendations(List<Talk> talks, int maxRecommendations = 5)
+        {
+            _ratingService.UpdateTalkRatings(talks);
+            return _ratingService.GetRecommendations(talks, maxRecommendations);
+        }
+
+        public void RateTalk(Talk talk, int rating, string comment = "")
+        {
+            _ratingService.RateTalk(talk.Id, rating, comment);
+        }
+
+        public List<TalkRating> GetRatingsForTalk(Talk talk)
+        {
+            return _ratingService.GetRatingsForTalk(talk.Id);
+        }
+
+        public void UpdateAllTalkRatings(List<Talk> talks)
+        {
+            _ratingService.UpdateTalkRatings(talks);
         }
     }
 }
