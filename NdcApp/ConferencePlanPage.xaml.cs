@@ -16,11 +16,33 @@ namespace NdcApp
         private Dictionary<string, Talk> selectedTalks = new(); // key: "Day|StartTime"
         private bool showAll = true;
         private string searchText = string.Empty;
+        private readonly TalkNotificationService? _notificationService;
+        private readonly ConferencePlanService _conferencePlanService;
 
         public ConferencePlanPage()
         {
             InitializeComponent();
+            
+            // Get services from DI
+            _notificationService = ServiceHelper.GetService<TalkNotificationService>();
+            _conferencePlanService = ServiceHelper.GetService<ConferencePlanService>() ?? new ConferencePlanService();
+            
             LoadTalks();
+            _ = InitializeNotificationsAsync();
+        }
+
+        private async Task InitializeNotificationsAsync()
+        {
+            if (_notificationService != null)
+            {
+                var hasPermission = await _notificationService.RequestNotificationPermissionAsync();
+                if (!hasPermission)
+                {
+                    await DisplayAlert("Notifications", 
+                        "Notification permission denied. You won't receive reminders for your selected talks.", 
+                        "OK");
+                }
+            }
         }
 
         private void LoadTalks()
@@ -51,10 +73,12 @@ namespace NdcApp
             TalksCollectionView.ItemsSource = allTalks;
         }
 
-        private void LoadSelectedTalks()
+        private async Task LoadSelectedTalks()
         {
             var selectedTalksRaw = Preferences.Default.Get(SELECTED_TALKS_PREFERENCE_KEY, "");
             selectedTalks.Clear();
+            _conferencePlanService.ClearSelectedTalks();
+            
             if (!string.IsNullOrEmpty(selectedTalksRaw))
             {
                 var selected = selectedTalksRaw.Split('|')
@@ -69,11 +93,16 @@ namespace NdcApp
                         Speaker = parts[5],
                         Category = parts[6]
                     });
+                    
                 foreach (var talk in selected)
                 {
                     var key = $"{talk.Day}|{talk.StartTime}";
                     selectedTalks[key] = talk;
+                    _conferencePlanService.SelectTalk(talk);
                 }
+                
+                // Schedule notifications for loaded talks
+                await ScheduleNotificationsAsync();
             }
         }
 
@@ -125,21 +154,29 @@ namespace NdcApp
             TalksCollectionView.ItemsSource = displayList;
         }
 
-        private void OnSelectTalk(object sender, EventArgs e)
+        private async void OnSelectTalk(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.CommandParameter is TalkDisplayItem item)
             {
                 var talk = item.Talk;
                 var key = $"{talk.Day}|{talk.StartTime}";
+                
+                // Update both local storage and core service
                 selectedTalks[key] = talk;
+                _conferencePlanService.SelectTalk(talk);
+                
                 // Save selected talks persistently
                 Preferences.Default.Set(SELECTED_TALKS_PREFERENCE_KEY, string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
+                
+                // Schedule notifications for all selected talks
+                await ScheduleNotificationsAsync();
+                
                 RefreshTalksView();
-                DisplayAlert("Selected", $"Selected: {talk.Title}", "OK");
+                await DisplayAlert("Selected", $"Selected: {talk.Title}\nNotifications scheduled for reminders.", "OK");
             }
         }
 
-        private void OnDeselectTalk(object sender, EventArgs e)
+        private async void OnDeselectTalk(object sender, EventArgs e)
         {
             if (sender is Button btn && btn.CommandParameter is TalkDisplayItem item)
             {
@@ -147,28 +184,43 @@ namespace NdcApp
                 var key = $"{talk.Day}|{talk.StartTime}";
                 if (selectedTalks.ContainsKey(key))
                 {
+                    // Update both local storage and core service
                     selectedTalks.Remove(key);
+                    _conferencePlanService.DeselectTalk(talk);
+                    
                     Preferences.Default.Set(SELECTED_TALKS_PREFERENCE_KEY, string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
+                    
+                    // Reschedule notifications (this will cancel old ones and create new ones)
+                    await ScheduleNotificationsAsync();
+                    
                     ShowSelectedTalksOnly();
                 }
             }
         }
 
-        private void OnSwipeSelectTalk(object sender, EventArgs e)
+        private async void OnSwipeSelectTalk(object sender, EventArgs e)
         {
             if (sender is SwipeItem swipeItem && swipeItem.CommandParameter is TalkDisplayItem item)
             {
                 var talk = item.Talk;
                 var key = $"{talk.Day}|{talk.StartTime}";
+                
+                // Update both local storage and core service
                 selectedTalks[key] = talk;
+                _conferencePlanService.SelectTalk(talk);
+                
                 // Save selected talks persistently
                 Preferences.Default.Set(SELECTED_TALKS_PREFERENCE_KEY, string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
+                
+                // Schedule notifications for all selected talks
+                await ScheduleNotificationsAsync();
+                
                 RefreshTalksView();
-                DisplayAlert("Selected", $"Selected: {talk.Title}", "OK");
+                await DisplayAlert("Selected", $"Selected: {talk.Title}\nNotifications scheduled for reminders.", "OK");
             }
         }
 
-        private void OnSwipeDeselectTalk(object sender, EventArgs e)
+        private async void OnSwipeDeselectTalk(object sender, EventArgs e)
         {
             if (sender is SwipeItem swipeItem && swipeItem.CommandParameter is TalkDisplayItem item)
             {
@@ -176,20 +228,45 @@ namespace NdcApp
                 var key = $"{talk.Day}|{talk.StartTime}";
                 if (selectedTalks.ContainsKey(key))
                 {
+                    // Update both local storage and core service
                     selectedTalks.Remove(key);
+                    _conferencePlanService.DeselectTalk(talk);
+                    
                     Preferences.Default.Set(SELECTED_TALKS_PREFERENCE_KEY, string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
+                    
+                    // Reschedule notifications
+                    await ScheduleNotificationsAsync();
+                    
                     RefreshTalksView();
-                    DisplayAlert("Deselected", $"Deselected: {talk.Title}", "OK");
+                    await DisplayAlert("Deselected", $"Deselected: {talk.Title}", "OK");
                 }
             }
         }
 
-        private void OnRefresh(object sender, EventArgs e)
+        private async Task ScheduleNotificationsAsync()
+        {
+            if (_notificationService != null)
+            {
+                try
+                {
+                    await _notificationService.ScheduleNotificationsForSelectedTalksAsync();
+                }
+                catch (Exception)
+                {
+                    // Log error but don't interrupt user experience
+                    await DisplayAlert("Notification Error", 
+                        "Failed to schedule notifications. Your talks are still selected.", 
+                        "OK");
+                }
+            }
+        }
+
+        private async void OnRefresh(object sender, EventArgs e)
         {
             // Reload talks from CSV
             LoadTalks();
             // Reload selected talks from preferences
-            LoadSelectedTalks();
+            await LoadSelectedTalks();
             // Refresh the current view
             if (showAll)
                 RefreshTalksView();
@@ -214,10 +291,10 @@ namespace NdcApp
             return TalkFilterService.FilterTalks(talks, searchText);
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
-            LoadSelectedTalks();
+            await LoadSelectedTalks();
             ShowSelectedTalksOnly();
         }
 
@@ -283,6 +360,46 @@ namespace NdcApp
                     .Select(t => new TalkDisplayItem { Talk = t, IsSelected = true })
                     .ToList();
                 TalksCollectionView.ItemsSource = sorted;
+            }
+        }
+
+        private async void OnNotificationsClicked(object sender, EventArgs e)
+        {
+            if (_notificationService == null)
+            {
+                await DisplayAlert("Notifications", "Notification service is not available.", "OK");
+                return;
+            }
+
+            try
+            {
+                var upcomingNotifications = await _notificationService.GetUpcomingNotificationsAsync();
+                var notificationList = upcomingNotifications.ToList();
+
+                if (!notificationList.Any())
+                {
+                    await DisplayAlert("Notifications", "No upcoming notifications scheduled.", "OK");
+                    return;
+                }
+
+                var message = "Upcoming notifications:\n\n";
+                foreach (var notification in notificationList.Take(5)) // Show first 5
+                {
+                    message += $"🔔 {notification.Title}\n";
+                    message += $"   {notification.Message}\n";
+                    message += $"   ⏰ {notification.ScheduledDateTime:MMM dd, HH:mm}\n\n";
+                }
+
+                if (notificationList.Count > 5)
+                {
+                    message += $"... and {notificationList.Count - 5} more notifications";
+                }
+
+                await DisplayAlert("Upcoming Notifications", message, "OK");
+            }
+            catch (Exception)
+            {
+                await DisplayAlert("Error", "Failed to load notifications.", "OK");
             }
         }
 

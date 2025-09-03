@@ -58,6 +58,8 @@
             <HorizontalStackLayout Margin="20,10,20,0" Spacing="10">
                 <Button x:Name="ShowAllBtn" Text="Alle Talks" Clicked="OnShowAllClicked" />
                 <Button x:Name="ShowSelectedBtn" Text="Meine Talks" Clicked="OnShowSelectedClicked" />
+                <Button x:Name="NotificationsBtn" Text="🔔" Clicked="OnNotificationsClicked" 
+                        ToolTipProperties.Text="View upcoming notifications" />
                 <Picker x:Name="SortPicker" Title="Sortieren" SelectedIndexChanged="OnSortPickerChanged">
                     <Picker.ItemsSource>
                         <x:Array Type="{x:Type x:String}">
