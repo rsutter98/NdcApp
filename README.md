@@ -185,9 +185,23 @@ NdcApp/
 3. Öffnen Sie die `.apk` Datei und installieren Sie die App
 4. Starten Sie die NdcApp über das App-Drawer
 
+**Apple/iOS-Installation:**
+1. **TestFlight (Empfohlen):**
+   - Installieren Sie die TestFlight App aus dem App Store (falls noch nicht vorhanden)
+   - Öffnen Sie den bereitgestellten TestFlight-Einladungslink
+   - Folgen Sie den Anweisungen zur Installation der Beta-Version
+   - Starten Sie die NdcApp über das Home-Bildschirm
+
+2. **Direkte Installation (Entwickler):**
+   - Laden Sie die `.ipa` Datei von der [Releases-Seite](https://github.com/rsutter98/NdcApp/releases) herunter
+   - Verwenden Sie Xcode oder ein Tool wie 3uTools zur Installation
+   - Vertrauen Sie dem Entwicklerzertifikat in den iOS-Einstellungen (Einstellungen > Allgemein > VPN & Geräteverwaltung)
+   - Starten Sie die NdcApp über das Home-Bildschirm
+
 **Systemanforderungen:**
 - **Windows**: Windows 10 Version 1903 oder höher
 - **Android**: Android 7.0 (API Level 24) oder höher
+- **iOS**: iOS 11.0 oder höher
 - **Speicherplatz**: Mindestens 50 MB freier Speicherplatz
 - **Internetverbindung**: Für CSV-Updates und Synchronisation
 
@@ -277,6 +291,11 @@ dotnet publish NdcApp -f net8.0-android -c Release
 ### Windows
 ```bash
 dotnet publish NdcApp -f net8.0-windows10.0.19041.0 -c Release
+```
+
+### iOS
+```bash
+dotnet publish NdcApp -f net8.0-ios -c Release
 ```
 
 ## 🔄 UI-Workflow und Benutzerreise
@@ -377,7 +396,6 @@ Alle Talks → Suche eingeben → Filter anwenden → Ergebnisse → Auswahl tre
 ## 📋 Bekannte Probleme
 
 - XAML-Binding-Warnungen (geplant zu beheben)
-- Noch keine iOS-Unterstützung konfiguriert
 - Performance bei sehr großen CSV-Dateien nicht getestet
 
 ## 🗺️ Roadmap
@@ -493,5 +511,5 @@ Bei Fragen oder Problemen erstellen Sie bitte ein Issue im GitHub-Repository.
 
 **Status**: Aktive Entwicklung  
 **Version**: 1.0.0-preview  
-**Zielplattformen**: Android, Windows  
+**Zielplattformen**: Android, Windows, iOS  
 **Letzte Aktualisierung**: Januar 2025

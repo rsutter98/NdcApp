@@ -7,6 +7,7 @@ Eine ausführliche Anleitung zur Nutzung der NdcApp für Konferenzteilnehmer.
 ### 1. Installation
 - **Windows**: Laden Sie die `.msix` Datei herunter und installieren Sie sie
 - **Android**: Laden Sie die `.apk` Datei herunter und aktivieren Sie "Installation aus unbekannten Quellen"
+- **Apple/iOS**: Verwenden Sie TestFlight für Beta-Installation oder installieren Sie die `.ipa` Datei über Xcode
 
 ### 2. Erster Start
 1. Öffnen Sie die NdcApp
