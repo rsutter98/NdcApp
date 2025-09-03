@@ -52,7 +52,7 @@
                 <Button x:Name="ShowSelectedBtn" Text="Meine Talks" Clicked="OnShowSelectedClicked" />
                 <Picker x:Name="SortPicker" Title="Sortieren" SelectedIndexChanged="OnSortPickerChanged">
                     <Picker.ItemsSource>
-                        <x:Array Type="x:String">
+                        <x:Array Type="{x:Type x:String}">
                             <x:String>Standard</x:String>
                             <x:String>Presenter</x:String>
                             <x:String>Category</x:String>
