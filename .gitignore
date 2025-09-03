@@ -40,4 +40,4 @@ publish/
 *.db
 *.lock
 # Ignore CSV in Raw if not needed
-Resources/Raw/*.csv
+# Resources/Raw/*.csv
