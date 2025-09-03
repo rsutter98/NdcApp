@@ -17,7 +17,10 @@ namespace NdcApp
         private bool showAll = true;
         private string searchText = string.Empty;
         private readonly TalkNotificationService? _notificationService;
-        private readonly ConferencePlanService _conferencePlanService;
+        private readonly IConferencePlanService _conferencePlanService;
+        private readonly ITalkService _talkService;
+        private readonly ITalkFilterService _talkFilterService;
+        private readonly IErrorHandlingService _errorHandlingService;
 
         public ConferencePlanPage()
         {
@@ -25,7 +28,10 @@ namespace NdcApp
             
             // Get services from DI
             _notificationService = ServiceHelper.GetService<TalkNotificationService>();
-            _conferencePlanService = ServiceHelper.GetService<ConferencePlanService>() ?? new ConferencePlanService();
+            _conferencePlanService = ServiceHelper.GetService<IConferencePlanService>() ?? throw new InvalidOperationException("ConferencePlanService not registered");
+            _talkService = ServiceHelper.GetService<ITalkService>() ?? throw new InvalidOperationException("TalkService not registered");
+            _talkFilterService = ServiceHelper.GetService<ITalkFilterService>() ?? throw new InvalidOperationException("TalkFilterService not registered");
+            _errorHandlingService = ServiceHelper.GetService<IErrorHandlingService>() ?? throw new InvalidOperationException("ErrorHandlingService not registered");
             
             LoadTalks();
             _ = InitializeNotificationsAsync();
@@ -45,32 +51,44 @@ namespace NdcApp
             }
         }
 
-        private void LoadTalks()
+        private async void LoadTalks()
         {
-            // Always load CSV from project Resources/Raw folder
-            string csvFileName = "ndc.csv";
-            string resourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Raw", csvFileName);
-            if (!System.IO.File.Exists(resourcePath))
+            try
             {
-                // Fallback: Try loading from project root (for debugging)
-                var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                var parentDir = Directory.GetParent(baseDir);
-                var grandParentDir = parentDir?.Parent;
-                var greatGrandParentDir = grandParentDir?.Parent;
-                if (greatGrandParentDir != null)
+                // Always load CSV from project Resources/Raw folder
+                string csvFileName = "ndc.csv";
+                string resourcePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Raw", csvFileName);
+                if (!System.IO.File.Exists(resourcePath))
                 {
-                    resourcePath = Path.Combine(greatGrandParentDir.FullName, "Resources", "Raw", csvFileName);
+                    // Fallback: Try loading from project root (for debugging)
+                    var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                    var parentDir = Directory.GetParent(baseDir);
+                    var grandParentDir = parentDir?.Parent;
+                    var greatGrandParentDir = grandParentDir?.Parent;
+                    if (greatGrandParentDir != null)
+                    {
+                        resourcePath = Path.Combine(greatGrandParentDir.FullName, "Resources", "Raw", csvFileName);
+                    }
                 }
+                
+                if (!System.IO.File.Exists(resourcePath))
+                {
+                    throw new FileNotFoundException($"CSV file not found: {resourcePath}");
+                }
+                
+                allTalks = _talkService.LoadTalks(resourcePath);
+                TalksCollectionView.ItemsSource = allTalks;
             }
-            if (!System.IO.File.Exists(resourcePath))
+            catch (Exception ex)
             {
-                DisplayAlert("Error", $"CSV file not found: {resourcePath}", "OK");
+                await _errorHandlingService.HandleErrorAsync(ex, "Failed to load talks");
+                var friendlyMessage = _errorHandlingService.GetUserFriendlyMessage(ex);
+                await DisplayAlert("Error", friendlyMessage, "OK");
+                
+                // Fallback to empty list
                 allTalks = new List<Talk>();
                 TalksCollectionView.ItemsSource = allTalks;
-                return;
             }
-            allTalks = TalkService.LoadTalks(resourcePath);
-            TalksCollectionView.ItemsSource = allTalks;
         }
 
         private async Task LoadSelectedTalks()
@@ -251,12 +269,11 @@ namespace NdcApp
                 {
                     await _notificationService.ScheduleNotificationsForSelectedTalksAsync();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // Log error but don't interrupt user experience
-                    await DisplayAlert("Notification Error", 
-                        "Failed to schedule notifications. Your talks are still selected.", 
-                        "OK");
+                    await _errorHandlingService.HandleErrorAsync(ex, "Failed to schedule notifications");
+                    var friendlyMessage = _errorHandlingService.GetUserFriendlyMessage(ex);
+                    await DisplayAlert("Notification Error", friendlyMessage, "OK");
                 }
             }
         }
@@ -288,7 +305,7 @@ namespace NdcApp
 
         private List<Talk> FilterTalks(List<Talk> talks)
         {
-            return TalkFilterService.FilterTalks(talks, searchText);
+            return _talkFilterService.FilterTalks(talks, searchText);
         }
 
         protected override async void OnAppearing()
@@ -425,9 +442,11 @@ namespace NdcApp
 
                 await DisplayAlert("Upcoming Notifications", message, "OK");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                await DisplayAlert("Error", "Failed to load notifications.", "OK");
+                await _errorHandlingService.HandleErrorAsync(ex, "Failed to load notifications");
+                var friendlyMessage = _errorHandlingService.GetUserFriendlyMessage(ex);
+                await DisplayAlert("Error", friendlyMessage, "OK");
             }
         }
 

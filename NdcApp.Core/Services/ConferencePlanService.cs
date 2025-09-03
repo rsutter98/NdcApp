@@ -5,14 +5,16 @@ using NdcApp.Core.Models;
 
 namespace NdcApp.Core.Services
 {
-    public class ConferencePlanService
+    public class ConferencePlanService : IConferencePlanService
     {
         private Dictionary<string, Talk> selectedTalks = new();
         private readonly ITalkRatingService _ratingService;
+        private readonly ILoggerService _logger;
 
-        public ConferencePlanService(ITalkRatingService? ratingService = null)
+        public ConferencePlanService(ITalkRatingService ratingService, ILoggerService logger)
         {
-            _ratingService = ratingService ?? new TalkRatingService();
+            _ratingService = ratingService ?? throw new ArgumentNullException(nameof(ratingService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public void SelectTalk(Talk talk)
@@ -20,6 +22,7 @@ namespace NdcApp.Core.Services
             if (talk == null) return;
             var key = $"{talk.Day}|{talk.StartTime}";
             selectedTalks[key] = talk;
+            _logger.LogInfo($"Talk selected: {talk.Title} by {talk.Speaker}");
         }
 
         public void DeselectTalk(Talk talk)
@@ -27,6 +30,7 @@ namespace NdcApp.Core.Services
             if (talk == null) return;
             var key = $"{talk.Day}|{talk.StartTime}";
             selectedTalks.Remove(key);
+            _logger.LogInfo($"Talk deselected: {talk.Title} by {talk.Speaker}");
         }
 
         public bool IsTalkSelected(Talk talk)
@@ -57,25 +61,35 @@ namespace NdcApp.Core.Services
             selectedTalks.Clear();
             if (string.IsNullOrEmpty(serializedTalks)) return;
 
-            var selected = serializedTalks.Split('|')
-                .Select(line => line.Split(','))
-                .Where(parts => parts.Length >= 7) // Support both old and new format
-                .Select(parts => new Talk {
-                    Day = parts[0],
-                    StartTime = TimeSpan.Parse(parts[1]),
-                    EndTime = TimeSpan.Parse(parts[2]),
-                    Room = parts[3],
-                    Title = parts[4],
-                    Speaker = parts[5],
-                    Category = parts[6],
-                    AverageRating = parts.Length > 7 && double.TryParse(parts[7], out var rating) ? rating : 0.0,
-                    RatingCount = parts.Length > 8 && int.TryParse(parts[8], out var count) ? count : 0
-                });
-
-            foreach (var talk in selected)
+            try
             {
-                var key = $"{talk.Day}|{talk.StartTime}";
-                selectedTalks[key] = talk;
+                var selected = serializedTalks.Split('|')
+                    .Select(line => line.Split(','))
+                    .Where(parts => parts.Length >= 7) // Support both old and new format
+                    .Select(parts => new Talk {
+                        Day = parts[0],
+                        StartTime = TimeSpan.Parse(parts[1]),
+                        EndTime = TimeSpan.Parse(parts[2]),
+                        Room = parts[3],
+                        Title = parts[4],
+                        Speaker = parts[5],
+                        Category = parts[6],
+                        AverageRating = parts.Length > 7 && double.TryParse(parts[7], out var rating) ? rating : 0.0,
+                        RatingCount = parts.Length > 8 && int.TryParse(parts[8], out var count) ? count : 0
+                    });
+
+                foreach (var talk in selected)
+                {
+                    var key = $"{talk.Day}|{talk.StartTime}";
+                    selectedTalks[key] = talk;
+                }
+                
+                _logger.LogInfo($"Deserialized {selectedTalks.Count} selected talks");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize selected talks");
+                throw;
             }
         }
 

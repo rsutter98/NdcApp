@@ -5,9 +5,9 @@ using NdcApp.Core.Models;
 
 namespace NdcApp.Core.Services
 {
-    public static class TalkFilterService
+    public class TalkFilterService : ITalkFilterService
     {
-        public static List<Talk> FilterTalks(List<Talk> talks, string searchText)
+        public List<Talk> FilterTalks(List<Talk> talks, string searchText)
         {
             if (string.IsNullOrWhiteSpace(searchText))
                 return talks;
