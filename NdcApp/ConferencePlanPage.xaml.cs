@@ -479,11 +479,11 @@ namespace NdcApp
         public Talk Talk { get; set; } = new Talk();
         public bool IsSelected { get; set; }
         
-        // Computed properties for display
-        public string RatingDisplay => Talk.RatingCount > 0 
+        // Computed properties for display with null safety
+        public string RatingDisplay => Talk?.RatingCount > 0 
             ? $"★ {Talk.AverageRating:F1} ({Talk.RatingCount})" 
             : "No ratings";
         
-        public bool HasRating => Talk.RatingCount > 0;
+        public bool HasRating => Talk?.RatingCount > 0;
     }
 }
