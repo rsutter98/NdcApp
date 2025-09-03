@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:NdcApp.Core.Models;assembly=NdcApp.Core"
+             x:Class="NdcApp.TalkRatingPage"
+             Title="Rate Talk">
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="NdcPrimary">#0A2342</Color>
+            <Color x:Key="NdcAccent">#FFB400</Color>
+            <Color x:Key="NdcSecondary">#FFFFFF</Color>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView BackgroundColor="{StaticResource NdcPrimary}">
+        <VerticalStackLayout Padding="20" Spacing="20">
+            
+            <!-- Talk Information -->
+            <Frame BackgroundColor="{StaticResource NdcAccent}" CornerRadius="16" Padding="20">
+                <VerticalStackLayout Spacing="10">
+                    <Label x:Name="TalkTitleLabel" 
+                           Text="Talk Title"
+                           FontSize="20" 
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource NdcPrimary}" />
+                    <Label x:Name="TalkSpeakerLabel" 
+                           Text="Speaker Name"
+                           FontSize="16"
+                           TextColor="{StaticResource NdcPrimary}" />
+                    <Label x:Name="CurrentRatingLabel" 
+                           Text="Current Rating: No ratings yet"
+                           FontSize="14"
+                           TextColor="{StaticResource NdcPrimary}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Rating Section -->
+            <Frame BackgroundColor="{StaticResource NdcSecondary}" CornerRadius="16" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Rate this talk:" 
+                           FontSize="18" 
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource NdcPrimary}" />
+                    
+                    <!-- Star Rating Buttons -->
+                    <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                        <Button x:Name="Star1" Text="★" FontSize="30" 
+                                BackgroundColor="Transparent" 
+                                TextColor="Gray"
+                                Clicked="OnStarClicked" />
+                        <Button x:Name="Star2" Text="★" FontSize="30" 
+                                BackgroundColor="Transparent" 
+                                TextColor="Gray"
+                                Clicked="OnStarClicked" />
+                        <Button x:Name="Star3" Text="★" FontSize="30" 
+                                BackgroundColor="Transparent" 
+                                TextColor="Gray"
+                                Clicked="OnStarClicked" />
+                        <Button x:Name="Star4" Text="★" FontSize="30" 
+                                BackgroundColor="Transparent" 
+                                TextColor="Gray"
+                                Clicked="OnStarClicked" />
+                        <Button x:Name="Star5" Text="★" FontSize="30" 
+                                BackgroundColor="Transparent" 
+                                TextColor="Gray"
+                                Clicked="OnStarClicked" />
+                    </HorizontalStackLayout>
+
+                    <!-- Comment Section -->
+                    <Label Text="Add a comment (optional):" 
+                           FontSize="16"
+                           TextColor="{StaticResource NdcPrimary}" />
+                    <Editor x:Name="CommentEditor" 
+                            Placeholder="Share your thoughts about this talk..."
+                            HeightRequest="100"
+                            BackgroundColor="{StaticResource NdcPrimary}"
+                            TextColor="{StaticResource NdcSecondary}"
+                            PlaceholderColor="Gray" />
+
+                    <!-- Submit Button -->
+                    <Button x:Name="SubmitRatingButton"
+                            Text="Submit Rating"
+                            BackgroundColor="{StaticResource NdcAccent}"
+                            TextColor="{StaticResource NdcPrimary}"
+                            FontAttributes="Bold"
+                            Clicked="OnSubmitRatingClicked"
+                            IsEnabled="False" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Existing Comments Section -->
+            <Frame BackgroundColor="{StaticResource NdcSecondary}" CornerRadius="16" Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Community Comments:" 
+                           FontSize="18" 
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource NdcPrimary}" />
+                    <CollectionView x:Name="CommentsCollectionView">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="{x:Type models:TalkRating}">
+                                <Grid Padding="10" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*">
+                                    <Label Grid.Row="0" 
+                                           Text="{Binding Rating, StringFormat='★ {0}/5'}"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource NdcAccent}" />
+                                    <Label Grid.Row="1" 
+                                           Text="{Binding Comment}"
+                                           TextColor="{StaticResource NdcPrimary}" />
+                                    <Label Grid.Row="2" 
+                                           Text="{Binding RatingDate, StringFormat='Rated on {0:MMM dd, yyyy}'}"
+                                           FontSize="12"
+                                           TextColor="Gray" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

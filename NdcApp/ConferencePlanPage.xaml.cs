@@ -70,6 +70,10 @@ namespace NdcApp
                 return;
             }
             allTalks = TalkService.LoadTalks(resourcePath);
+            
+            // Load sample rating data for demonstration
+            SampleRatingDataService.LoadSampleRatingData(_conferencePlanService.GetRatingService(), allTalks);
+            
             TalksCollectionView.ItemsSource = allTalks;
         }
 
@@ -240,6 +244,15 @@ namespace NdcApp
                     RefreshTalksView();
                     await DisplayAlert("Deselected", $"Deselected: {talk.Title}", "OK");
                 }
+            }
+        }
+
+        private async void OnSwipeRateTalk(object sender, EventArgs e)
+        {
+            if (sender is SwipeItem swipeItem && swipeItem.CommandParameter is TalkDisplayItem item)
+            {
+                var ratingPage = new TalkRatingPage(item.Talk, _conferencePlanService);
+                await Navigation.PushAsync(ratingPage);
             }
         }
 

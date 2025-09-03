@@ -83,6 +83,10 @@
                                                    CommandParameter="{Binding .}"
                                                    Invoked="OnSwipeSelectTalk"
                                                    IsVisible="{Binding IsSelected, Converter={StaticResource InverseBoolConverter}}" />
+                                        <SwipeItem Text="Rate" 
+                                                   BackgroundColor="{StaticResource NdcSecondary}"
+                                                   CommandParameter="{Binding .}"
+                                                   Invoked="OnSwipeRateTalk" />
                                         <SwipeItem Text="Deselect" 
                                                    BackgroundColor="Red"
                                                    CommandParameter="{Binding .}"

@@ -144,5 +144,10 @@ namespace NdcApp.Core.Services
         {
             _ratingService.UpdateTalkRatings(talks);
         }
+
+        public ITalkRatingService GetRatingService()
+        {
+            return _ratingService;
+        }
     }
 }
