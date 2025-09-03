@@ -48,6 +48,13 @@
     <ScrollView>
         <VerticalStackLayout Padding="0" Spacing="0" BackgroundColor="{StaticResource NdcPrimary}">
             <Label Text="Conference Plan" Style="{StaticResource NdcHeadline}" Margin="20,30,20,10" />
+            <SearchBar x:Name="SearchBarControl" 
+                       Placeholder="Search talks, speakers, categories..." 
+                       Margin="20,0,20,10"
+                       TextChanged="OnSearchTextChanged"
+                       BackgroundColor="{StaticResource NdcSecondary}"
+                       TextColor="{StaticResource NdcPrimary}"
+                       PlaceholderColor="Gray" />
             <HorizontalStackLayout Margin="20,10,20,0" Spacing="10">
                 <Button x:Name="ShowAllBtn" Text="Alle Talks" Clicked="OnShowAllClicked" />
                 <Button x:Name="ShowSelectedBtn" Text="Meine Talks" Clicked="OnShowSelectedClicked" />
@@ -61,33 +68,51 @@
                     </Picker.ItemsSource>
                 </Picker>
             </HorizontalStackLayout>
-            <CollectionView x:Name="TalksCollectionView" Margin="10">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="{x:Type local:TalkDisplayItem}">
-                        <Border Stroke="{StaticResource NdcAccent}" Background="{StaticResource NdcPrimary}" StrokeThickness="2" Margin="0,10" Padding="10" StrokeShape="Rectangle" >
-                            <VerticalStackLayout>
-                                <Label Text="{Binding Talk.Title}" Style="{StaticResource NdcTalkTitle}" />
-                                <Label Text="{Binding Talk.Speaker}" Style="{StaticResource NdcTalkSpeaker}" />
-                                <Label Text="{Binding Talk.Day}" Style="{StaticResource NdcTalkInfo}" />
-                                <Label Text="{Binding Talk.StartTime}" Style="{StaticResource NdcTalkInfo}" />
-                                <Button 
-                                    Text="{Binding IsSelected, Converter={StaticResource SelectedTextConverter}}"
-                                    BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedColorConverter}}"
-                                    CommandParameter="{Binding .}"
-                                    Clicked="OnSelectTalk"
-                                    IsVisible="{Binding IsSelected, Converter={StaticResource InverseBoolConverter}}" />
-                                <Button 
-                                    Text="Deselect"
-                                    BackgroundColor="{StaticResource NdcAccent}"
-                                    TextColor="{StaticResource NdcPrimary}"
-                                    CommandParameter="{Binding .}"
-                                    Clicked="OnDeselectTalk"
-                                    IsVisible="{Binding IsSelected}" />
-                            </VerticalStackLayout>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+            <RefreshView x:Name="RefreshViewControl" Refreshing="OnRefresh">
+                <CollectionView x:Name="TalksCollectionView" Margin="10">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="{x:Type local:TalkDisplayItem}">
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem Text="Select" 
+                                                   BackgroundColor="{StaticResource NdcAccent}"
+                                                   CommandParameter="{Binding .}"
+                                                   Invoked="OnSwipeSelectTalk"
+                                                   IsVisible="{Binding IsSelected, Converter={StaticResource InverseBoolConverter}}" />
+                                        <SwipeItem Text="Deselect" 
+                                                   BackgroundColor="Red"
+                                                   CommandParameter="{Binding .}"
+                                                   Invoked="OnSwipeDeselectTalk"
+                                                   IsVisible="{Binding IsSelected}" />
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+                                <Border Stroke="{StaticResource NdcAccent}" Background="{StaticResource NdcPrimary}" StrokeThickness="2" Margin="0,10" Padding="10" StrokeShape="Rectangle" >
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Talk.Title}" Style="{StaticResource NdcTalkTitle}" />
+                                        <Label Text="{Binding Talk.Speaker}" Style="{StaticResource NdcTalkSpeaker}" />
+                                        <Label Text="{Binding Talk.Day}" Style="{StaticResource NdcTalkInfo}" />
+                                        <Label Text="{Binding Talk.StartTime}" Style="{StaticResource NdcTalkInfo}" />
+                                        <Button 
+                                            Text="{Binding IsSelected, Converter={StaticResource SelectedTextConverter}}"
+                                            BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedColorConverter}}"
+                                            CommandParameter="{Binding .}"
+                                            Clicked="OnSelectTalk"
+                                            IsVisible="{Binding IsSelected, Converter={StaticResource InverseBoolConverter}}" />
+                                        <Button 
+                                            Text="Deselect"
+                                            BackgroundColor="{StaticResource NdcAccent}"
+                                            TextColor="{StaticResource NdcPrimary}"
+                                            CommandParameter="{Binding .}"
+                                            Clicked="OnDeselectTalk"
+                                            IsVisible="{Binding IsSelected}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
