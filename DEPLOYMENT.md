@@ -4,6 +4,13 @@
 
 Diese Dokumentation beschreibt den Deployment-Prozess für die NDC Conference Planner App (.NET MAUI).
 
+## Overview
+
+The NdcApp is a .NET MAUI cross-platform application that can be deployed to:
+- **Android** (APK)
+- **Windows** (MSIX Package)
+- **iOS** (App Store/Enterprise)
+
 ## 🏗️ CI/CD Pipeline
 
 ### Automatisierte Builds
@@ -12,30 +19,72 @@ Die CI/CD-Pipeline ist über GitHub Actions konfiguriert und unterstützt:
 
 - **Kontinuierliche Integration**: Automatische Builds und Tests bei Pull Requests
 - **Kontinuierliche Bereitstellung**: Automatische Erstellung von Release-Artifacts
-- **Multi-Platform Support**: Windows (MSIX) und Android (APK)
+- **Multi-Platform Support**: Windows (MSIX), Android (APK), und iOS (App)
+
+### Continuous Integration (CI)
+
+#### Pull Request Testing
+Every pull request triggers automated testing:
+- Build verification across all projects
+- Unit test execution (99+ tests)
+- Test result artifacts
+
+**Workflow:** `.github/workflows/ci.yml`
+
+#### Branches
+- `main` - Production branch
+- `develop` - Development branch
+- Feature branches trigger CI on PR
 
 ### Pipeline-Trigger
 
 | Trigger | Aktion | Beschreibung |
 |---------|--------|--------------|
-| Push zu `main` | Build + Test + Deploy | Vollständige Pipeline |
+| Push zu `main` | Build + Test | CI-Validierung |
 | Push zu `develop` | Build + Test | Nur Validierung |
 | Pull Request | Build + Test | Code-Validierung |
-| Release Published | Build + Test + Deploy + Publish | Release-Erstellung |
+| Git Tags (`v*`) | Build + Test + Deploy + Publish | Release-Erstellung |
+| Manual Trigger | Build + Test + Deploy + Publish | Manuelle Release-Erstellung |
+
+## Continuous Deployment (CD)
+
+### Release Process
+Releases are triggered by:
+1. **Git Tags**: Push a tag like `v1.0.0`
+2. **Manual Trigger**: Use GitHub Actions manual dispatch
+
+**Workflow:** `.github/workflows/release.yml`
 
 ## 🎯 Zielplattformen
 
-### Windows 10/11
-- **Format**: MSIX Package
-- **Minimum Version**: Windows 10 Build 17763 (Version 1809)
-- **Installation**: Über Microsoft Store oder Sideloading
-- **Updates**: Automatisch über Store oder manuell
+### Platform Builds
 
-### Android
+#### Android APK
+- **Framework:** `net8.0-android`
 - **Format**: APK Package
 - **Minimum Version**: Android 5.0 (API Level 21)
 - **Target Version**: Android 14 (API Level 34)
 - **Installation**: Sideloading (APK direkt installieren)
+- **Output:** APK file
+- **Location:** `NdcApp/bin/Release/net8.0-android/publish/`
+- **Runner:** Ubuntu Latest
+
+#### Windows MSIX
+- **Framework:** `net8.0-windows10.0.19041.0`
+- **Format**: MSIX Package
+- **Minimum Version**: Windows 10 Build 19041 (Version 2004)
+- **Installation**: Über Microsoft Store oder Sideloading
+- **Updates**: Automatisch über Store oder manuell
+- **Output:** MSIX package
+- **Location:** `NdcApp/bin/Release/net8.0-windows10.0.19041.0/win10-x64/AppPackages/`
+- **Runner:** Windows Latest
+
+#### iOS App
+- **Framework:** `net8.0-ios`
+- **Output:** .app bundle
+- **Location:** `NdcApp/bin/Release/net8.0-ios/`
+- **Runner:** macOS Latest
+- **Note:** Requires Apple Developer Account for App Store deployment
 
 ## 🚀 Deployment-Prozess
 
@@ -51,7 +100,50 @@ dotnet publish -f net8.0-windows10.0.19041.0 -c Release
 dotnet publish -f net8.0-android -c Release
 ```
 
-### 2. Continuous Integration
+### 2. Local Development Builds
+
+#### Prerequisites
+- .NET 8.0 SDK
+- MAUI workload: `dotnet workload install maui`
+
+#### Build Scripts
+Located in `scripts/build/`:
+
+##### Android
+```bash
+./scripts/build/build-android.sh
+```
+
+##### Windows
+```cmd
+scripts\build\build-windows.bat
+```
+
+##### iOS
+```bash
+./scripts/build/build-ios.sh
+```
+
+#### Manual Commands
+
+##### Build All Platforms
+```bash
+dotnet build -c Release
+```
+
+##### Build Specific Platform
+```bash
+# Android
+dotnet publish NdcApp/NdcApp.csproj -f net8.0-android -c Release
+
+# Windows
+dotnet publish NdcApp/NdcApp.csproj -f net8.0-windows10.0.19041.0 -c Release
+
+# iOS
+dotnet build NdcApp/NdcApp.csproj -f net8.0-ios -c Release
+```
+
+### 3. Continuous Integration
 
 Bei jedem Push wird automatisch ausgeführt:
 
@@ -62,7 +154,7 @@ Bei jedem Push wird automatisch ausgeführt:
 5. **Tests**: Alle 99 Tests ausgeführt
 6. **Artifacts**: Test-Ergebnisse gespeichert
 
-### 3. Platform Builds (bei Main-Push oder Release)
+### 4. Platform Builds (bei Tags oder Manual Trigger)
 
 #### Windows Build
 - Läuft auf: `windows-latest` Runner
@@ -71,20 +163,24 @@ Bei jedem Push wird automatisch ausgeführt:
 - Artifacts gespeichert
 
 #### Android Build
-- Läuft auf: `windows-latest` Runner
+- Läuft auf: `ubuntu-latest` Runner
 - MAUI Workload installiert
-- Java JDK 11 Setup
 - APK Package erstellt
 - Artifacts gespeichert
 
-### 4. Release-Erstellung
+#### iOS Build
+- Läuft auf: `macos-latest` Runner
+- MAUI Workload installiert
+- App Bundle erstellt
+- Artifacts gespeichert
+
+### 5. Release-Erstellung
 
 Bei einem GitHub Release:
 
 1. **Download**: Platform-Artifacts heruntergeladen
-2. **Package**: ZIP-Archive erstellt
-3. **Upload**: Artifacts zum Release hinzugefügt
-4. **Documentation**: Release Notes automatisch generiert
+2. **Release Creation**: GitHub Release mit allen Artifacts
+3. **Documentation**: Release Notes automatisch generiert
 
 ## 📦 Installation
 
@@ -96,125 +192,108 @@ Bei einem GitHub Release:
 4. **App erscheint im Startmenü**
 
 **Voraussetzungen:**
-- Windows 10 Version 1809 oder neuer
-- Developer Mode aktiviert (für Sideloading)
+- Windows 10 Version 2004 oder neuer
+- .NET Runtime wird automatisch installiert
 
 ### Android
 
-1. **APK Datei herunterladen**
-2. **"Installation aus unbekannten Quellen" aktivieren**
-3. **APK Datei öffnen**
-4. **"Installieren" bestätigen**
+1. **APK Package herunterladen**
+2. **"Unbekannte Quellen" aktivieren** (Einstellungen > Sicherheit)
+3. **APK-Datei antippen** und "Installieren" wählen
+4. **App erscheint in der App-Übersicht**
 
 **Voraussetzungen:**
-- Android 5.0 oder neuer
+- Android 5.0 (API Level 21) oder neuer
 - Mindestens 100 MB freier Speicherplatz
 
-## 🔄 Update-Strategie
+### iOS
 
-### Automatische Updates
-- **Windows**: Über Microsoft Store (wenn veröffentlicht)
-- **Android**: Über Google Play Store (wenn veröffentlicht)
+**App Store Distribution:**
+1. App über TestFlight oder App Store installieren
 
-### Manuelle Updates
-- **Windows**: Neue MSIX installieren (überschreibt alte Version)
-- **Android**: Neue APK installieren (überschreibt alte Version)
+**Enterprise/Sideloading:**
+1. Developer Certificate erforderlich
+2. Provisioning Profile konfigurieren
+3. App über Xcode oder Apple Configurator installieren
 
-## ⚡ Rollback-Strategie
-
-### Windows Rollback
-
-1. **Deinstallation**:
-   - `Einstellungen > Apps > NDC Conference Planner > Deinstallieren`
-   
-2. **Vorherige Version installieren**:
-   - Vorherige MSIX-Datei aus Releases herunterladen
-   - Normal installieren
-
-### Android Rollback
-
-1. **Deinstallation**:
-   - `Einstellungen > Apps > NDC Conference Planner > Deinstallieren`
-   
-2. **Vorherige Version installieren**:
-   - Vorherige APK-Datei installieren
-   - Daten bleiben erhalten (außer bei App-Data-Incompatibilität)
-
-### Datenbank-Migration
-
-Bei Breaking Changes in der Datenstruktur:
-
-```csharp
-// Beispiel für Datenbank-Migration
-public void MigrateFromVersion(string fromVersion, string toVersion)
-{
-    if (fromVersion == "1.0.0" && toVersion == "1.1.0")
-    {
-        // Migration Logic hier
-    }
-}
-```
+**Voraussetzungen:**
+- iOS 11.0 oder neuer
+- Apple Developer Account (für Entwicklung/Distribution)
 
 ## 🔧 Troubleshooting
 
 ### Häufige Probleme
 
-#### Windows
+#### Windows Installation schlägt fehl
+- **Problem**: "Diese App kann nicht installiert werden"
+- **Lösung**: Developer-Modus aktivieren oder Certificate vertrauen
 
-**Problem**: MSIX Installation schlägt fehl
-- **Lösung**: Developer Mode aktivieren oder Zertifikat installieren
+#### Android APK Installation blockiert
+- **Problem**: "Installation aus unbekannten Quellen blockiert"
+- **Lösung**: Sicherheitseinstellungen prüfen und "Unbekannte Quellen" aktivieren
 
-**Problem**: App startet nicht
-- **Lösung**: Windows Update durchführen, .NET Desktop Runtime installieren
+#### Build Fehler in CI/CD
+- **Problem**: MAUI Workload nicht gefunden
+- **Lösung**: Pipeline Script überprüfen, Workload Installation sicherstellen
 
-#### Android
+## 🔄 Rollback-Strategie
 
-**Problem**: APK Installation blockiert
-- **Lösung**: "Unbekannte Quellen" in den Sicherheitseinstellungen aktivieren
+### Windows
+1. **App deinstallieren** über Windows-Einstellungen
+2. **Vorherige Version installieren** (falls verfügbar)
+3. **App-Daten bleiben erhalten** (LocalApplicationData)
 
-**Problem**: App crasht beim Start
-- **Lösung**: Android Version prüfen (mind. 5.0), Speicherplatz freigeben
+### Android
+1. **App deinstallieren** über Android-Einstellungen
+2. **Vorherige APK installieren**
+3. **App-Daten gehen verloren** (Backup empfohlen)
 
-### Logs und Debugging
+### iOS
+1. **App löschen** vom Homescreen
+2. **Vorherige Version über TestFlight/App Store** installieren
+3. **iCloud Backup** kann Daten wiederherstellen
 
-#### Lokale Logs
-- **Windows**: `%LOCALAPPDATA%\Packages\com.ndcapp.conferenceplanner_*\LocalState\logs`
-- **Android**: Via `adb logcat` oder in der App über Debug-Menü
+## 📊 Pipeline Monitoring
 
-#### CI/CD Logs
-- GitHub Actions: Workflow-Logs in Repository
-- Test Results: Downloadbare Artifacts nach jedem Build
+### GitHub Actions
+- **Dashboard**: Repository → Actions Tab
+- **Logs**: Detaillierte Build-Logs pro Workflow
+- **Artifacts**: Download verfügbar für 90 Tage
 
-## 📊 Monitoring
+### Pipeline Validation
+```bash
+# Pipeline Validierung lokal ausführen
+./scripts/validate-pipeline.sh
+```
 
-### Build-Status
-- Badge im README.md zeigt aktuellen Pipeline-Status
-- GitHub Actions Dashboard für detaillierte Logs
+### Metriken
+- **Build Zeit**: Durchschnittlich 15-20 Minuten
+- **Test Coverage**: 99+ Tests
+- **Artifact Größe**: 
+  - Windows MSIX: ~50-80 MB
+  - Android APK: ~30-50 MB
+  - iOS App: ~40-60 MB
 
-### Releases
-- GitHub Releases für Download-Statistiken
-- Artifact-Download-Counter
-
-### Performance
-- App-Start-Zeit: < 3 Sekunden
-- Memory Usage: < 200 MB
-- Package-Größe: Windows ~50MB, Android ~30MB
-
-## 🛡️ Security Considerations
+## 🛡️ Sicherheit
 
 ### Code Signing
-- **Windows**: MSIX signiert mit verfügbarem Zertifikat
-- **Android**: APK signiert mit Debug-Key (für Entwicklung)
+- **Windows**: MSIX Pakete können signiert werden
+- **Android**: APK Signierung optional für Sideloading
+- **iOS**: Zwingend erforderlich für Distribution
 
-**Produktionshinweis**: Für Store-Veröffentlichung sind entsprechende Certificates/Keys erforderlich.
+### Dependency Management
+- **Dependabot**: Automatische Updates für NuGet und GitHub Actions
+- **Security Alerts**: GitHub Security Advisories aktiviert
+- **Vulnerability Scanning**: Integriert in CI/CD Pipeline
 
-### Permissions
-- **Windows**: Standardberechtigungen (Dateisystem, Netzwerk)
-- **Android**: Minimalberechtigungen (Speicher, Benachrichtigungen)
+## 📚 Weitere Ressourcen
 
-## 🔗 Weiterführende Links
+- **Build Documentation**: `BUILD.md`
+- **Security Policy**: `SECURITY.md`
+- **User Manual**: `BENUTZERHANDBUCH.md`
+- **Feature Overview**: `FEATURES.md`
+- **Roadmap**: `ROADMAP.md`
 
-- [.NET MAUI Dokumentation](https://docs.microsoft.com/en-us/dotnet/maui/)
-- [GitHub Actions Dokumentation](https://docs.github.com/en/actions)
-- [MSIX Packaging](https://docs.microsoft.com/en-us/windows/msix/)
-- [Android APK Deployment](https://developer.android.com/studio/publish)
+---
+
+*Für Support oder Fragen zur Deployment-Pipeline, bitte ein Issue auf GitHub erstellen.*

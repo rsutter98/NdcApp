@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <TargetFrameworks Condition="'$(BuildingForRelease)' == 'true'">net8.0-android;net8.0-ios;net8.0-windows10.0.19041.0</TargetFrameworks>
         <RootNamespace>NdcApp</RootNamespace>
         <UseMaui>true</UseMaui>
         <SingleProject>true</SingleProject>
@@ -24,19 +25,23 @@
         <!-- Deployment optimizations -->
         <TrimMode>copyused</TrimMode>
         <PublishTrimmed>true</PublishTrimmed>
-        
-        <!-- Platform support -->
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-    </PropertyGroup>
 
-    <!-- Enable platform-specific configurations in CI/CD -->
-    <PropertyGroup>
-        <WindowsPackageType Condition="'$(CI_PLATFORM)' == 'windows'">MSIX</WindowsPackageType>
-        <AndroidMinSdkVersion Condition="'$(CI_PLATFORM)' == 'android'">21</AndroidMinSdkVersion>
-        <AndroidTargetSdkVersion Condition="'$(CI_PLATFORM)' == 'android'">34</AndroidTargetSdkVersion>
-        <AndroidCompileSdkVersion Condition="'$(CI_PLATFORM)' == 'android'">34</AndroidCompileSdkVersion>
+        <!-- Windows packaging configuration -->
+        <WindowsPackageType>MSIX</WindowsPackageType>
+        <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+        
+        <!-- Windows platform versions -->
+        <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">10.0.19041.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">10.0.19041.0</TargetPlatformMinVersion>
+        <SupportedOSPlatformVersion Condition="'$(TargetFramework)' != 'net8.0-windows10.0.19041.0'">10.0.17763.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion Condition="'$(TargetFramework)' != 'net8.0-windows10.0.19041.0'">10.0.17763.0</TargetPlatformMinVersion>
+        
+        <!-- MSIX packaging properties -->
+        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+        <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+        <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+        <GenerateTestArtifacts>True</GenerateTestArtifacts>
+        <AppxBundle>Never</AppxBundle>
     </PropertyGroup>
 
     <ItemGroup>
@@ -73,5 +78,25 @@
     <ItemGroup>
         <ProjectReference Include="..\NdcApp.Core\NdcApp.Core.csproj" />
     </ItemGroup>
+
+    <!-- Platform-specific configurations -->
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
+        <AndroidPackageFormat>apk</AndroidPackageFormat>
+        <AndroidUseAapt2>true</AndroidUseAapt2>
+        <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+        <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-ios'">
+        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+        <CodesignProvision Condition="'$(Configuration)' == 'Release'"></CodesignProvision>
+        <CodesignKey Condition="'$(Configuration)' == 'Release'">iPhone Distribution</CodesignKey>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">
+        <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+        <UseWinUI>true</UseWinUI>
+        <EnableMsixTooling>true</EnableMsixTooling>
+    </PropertyGroup>
 
 </Project>
