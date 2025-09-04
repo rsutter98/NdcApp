@@ -1,8 +1,6 @@
-# Deployment Guide - NDC Conference Planner
+# Deployment Guide
 
-## Übersicht
-
-Diese Dokumentation beschreibt den Deployment-Prozess für die NDC Conference Planner App (.NET MAUI).
+This document describes the deployment pipeline and build processes for the NdcApp.
 
 ## Overview
 
@@ -11,19 +9,9 @@ The NdcApp is a .NET MAUI cross-platform application that can be deployed to:
 - **Windows** (MSIX Package)
 - **iOS** (App Store/Enterprise)
 
-## 🏗️ CI/CD Pipeline
+## Continuous Integration (CI)
 
-### Automatisierte Builds
-
-Die CI/CD-Pipeline ist über GitHub Actions konfiguriert und unterstützt:
-
-- **Kontinuierliche Integration**: Automatische Builds und Tests bei Pull Requests
-- **Kontinuierliche Bereitstellung**: Automatische Erstellung von Release-Artifacts
-- **Multi-Platform Support**: Windows (MSIX), Android (APK), und iOS (App)
-
-### Continuous Integration (CI)
-
-#### Pull Request Testing
+### Pull Request Testing
 Every pull request triggers automated testing:
 - Build verification across all projects
 - Unit test execution (99+ tests)
@@ -31,20 +19,11 @@ Every pull request triggers automated testing:
 
 **Workflow:** `.github/workflows/ci.yml`
 
-#### Branches
+### Branches
 - `main` - Production branch
 - `develop` - Development branch
 - Feature branches trigger CI on PR
 
-### Pipeline-Trigger
-
-| Trigger | Aktion | Beschreibung |
-|---------|--------|--------------|
-| Push zu `main` | Build + Test | CI-Validierung |
-| Push zu `develop` | Build + Test | Nur Validierung |
-| Pull Request | Build + Test | Code-Validierung |
-| Git Tags (`v*`) | Build + Test + Deploy + Publish | Release-Erstellung |
-| Manual Trigger | Build + Test + Deploy + Publish | Manuelle Release-Erstellung |
 
 ## Continuous Deployment (CD)
 
@@ -55,29 +34,22 @@ Releases are triggered by:
 
 **Workflow:** `.github/workflows/release.yml`
 
-## 🎯 Zielplattformen
 
 ### Platform Builds
 
 #### Android APK
 - **Framework:** `net8.0-android`
-- **Format**: APK Package
-- **Minimum Version**: Android 5.0 (API Level 21)
-- **Target Version**: Android 14 (API Level 34)
-- **Installation**: Sideloading (APK direkt installieren)
+
 - **Output:** APK file
 - **Location:** `NdcApp/bin/Release/net8.0-android/publish/`
 - **Runner:** Ubuntu Latest
 
 #### Windows MSIX
 - **Framework:** `net8.0-windows10.0.19041.0`
-- **Format**: MSIX Package
-- **Minimum Version**: Windows 10 Build 19041 (Version 2004)
-- **Installation**: Über Microsoft Store oder Sideloading
-- **Updates**: Automatisch über Store oder manuell
 - **Output:** MSIX package
 - **Location:** `NdcApp/bin/Release/net8.0-windows10.0.19041.0/win10-x64/AppPackages/`
 - **Runner:** Windows Latest
+- **Requirements:** Windows 10 version 19041.0 or later
 
 #### iOS App
 - **Framework:** `net8.0-ios`
@@ -86,52 +58,38 @@ Releases are triggered by:
 - **Runner:** macOS Latest
 - **Note:** Requires Apple Developer Account for App Store deployment
 
-## 🚀 Deployment-Prozess
+## Local Development Builds
 
-### 1. Entwicklung und Testing
-
-```bash
-# Lokale Entwicklung
-dotnet build
-dotnet test
-
-# Platform-spezifische Builds (erfordert Windows + MAUI Workload)
-dotnet publish -f net8.0-windows10.0.19041.0 -c Release
-dotnet publish -f net8.0-android -c Release
-```
-
-### 2. Local Development Builds
-
-#### Prerequisites
+### Prerequisites
 - .NET 8.0 SDK
 - MAUI workload: `dotnet workload install maui`
 
-#### Build Scripts
+### Build Scripts
 Located in `scripts/build/`:
 
-##### Android
+#### Android
 ```bash
 ./scripts/build/build-android.sh
 ```
 
-##### Windows
+#### Windows
 ```cmd
 scripts\build\build-windows.bat
 ```
 
-##### iOS
+#### iOS
 ```bash
 ./scripts/build/build-ios.sh
 ```
 
-#### Manual Commands
+### Manual Commands
 
-##### Build All Platforms
+#### Build All Platforms
 ```bash
 dotnet build -c Release
 ```
 
-##### Build Specific Platform
+#### Build Specific Platform
 ```bash
 # Android
 dotnet publish NdcApp/NdcApp.csproj -f net8.0-android -c Release
@@ -143,157 +101,119 @@ dotnet publish NdcApp/NdcApp.csproj -f net8.0-windows10.0.19041.0 -c Release
 dotnet build NdcApp/NdcApp.csproj -f net8.0-ios -c Release
 ```
 
-### 3. Continuous Integration
+## Release Artifacts
 
-Bei jedem Push wird automatisch ausgeführt:
+### Automated Release Creation
+When a tag is pushed, the release workflow:
+1. Builds all platforms
+2. Creates GitHub release
+3. Uploads all artifacts
+4. Generates release notes
 
-1. **Code Checkout**: Repository wird geladen
-2. **Environment Setup**: .NET 8.0 SDK installiert
-3. **Dependencies**: NuGet-Pakete wiederhergestellt
-4. **Build**: Solution kompiliert (Release-Konfiguration)
-5. **Tests**: Alle 99 Tests ausgeführt
-6. **Artifacts**: Test-Ergebnisse gespeichert
-
-### 4. Platform Builds (bei Tags oder Manual Trigger)
-
-#### Windows Build
-- Läuft auf: `windows-latest` Runner
-- MAUI Workload installiert
-- MSIX Package erstellt
-- Artifacts gespeichert
-
-#### Android Build
-- Läuft auf: `ubuntu-latest` Runner
-- MAUI Workload installiert
-- APK Package erstellt
-- Artifacts gespeichert
-
-#### iOS Build
-- Läuft auf: `macos-latest` Runner
-- MAUI Workload installiert
-- App Bundle erstellt
-- Artifacts gespeichert
-
-### 5. Release-Erstellung
-
-Bei einem GitHub Release:
-
-1. **Download**: Platform-Artifacts heruntergeladen
-2. **Release Creation**: GitHub Release mit allen Artifacts
-3. **Documentation**: Release Notes automatisch generiert
-
-## 📦 Installation
-
-### Windows
-
-1. **MSIX Package herunterladen**
-2. **Doppelklick auf .msix Datei**
-3. **"Installieren" klicken**
-4. **App erscheint im Startmenü**
-
-**Voraussetzungen:**
-- Windows 10 Version 2004 oder neuer
-- .NET Runtime wird automatisch installiert
-
-### Android
-
-1. **APK Package herunterladen**
-2. **"Unbekannte Quellen" aktivieren** (Einstellungen > Sicherheit)
-3. **APK-Datei antippen** und "Installieren" wählen
-4. **App erscheint in der App-Übersicht**
-
-**Voraussetzungen:**
-- Android 5.0 (API Level 21) oder neuer
-- Mindestens 100 MB freier Speicherplatz
-
-### iOS
-
-**App Store Distribution:**
-1. App über TestFlight oder App Store installieren
-
-**Enterprise/Sideloading:**
-1. Developer Certificate erforderlich
-2. Provisioning Profile konfigurieren
-3. App über Xcode oder Apple Configurator installieren
-
-**Voraussetzungen:**
-- iOS 11.0 oder neuer
-- Apple Developer Account (für Entwicklung/Distribution)
-
-## 🔧 Troubleshooting
-
-### Häufige Probleme
-
-#### Windows Installation schlägt fehl
-- **Problem**: "Diese App kann nicht installiert werden"
-- **Lösung**: Developer-Modus aktivieren oder Certificate vertrauen
-
-#### Android APK Installation blockiert
-- **Problem**: "Installation aus unbekannten Quellen blockiert"
-- **Lösung**: Sicherheitseinstellungen prüfen und "Unbekannte Quellen" aktivieren
-
-#### Build Fehler in CI/CD
-- **Problem**: MAUI Workload nicht gefunden
-- **Lösung**: Pipeline Script überprüfen, Workload Installation sicherstellen
-
-## 🔄 Rollback-Strategie
-
-### Windows
-1. **App deinstallieren** über Windows-Einstellungen
-2. **Vorherige Version installieren** (falls verfügbar)
-3. **App-Daten bleiben erhalten** (LocalApplicationData)
-
-### Android
-1. **App deinstallieren** über Android-Einstellungen
-2. **Vorherige APK installieren**
-3. **App-Daten gehen verloren** (Backup empfohlen)
-
-### iOS
-1. **App löschen** vom Homescreen
-2. **Vorherige Version über TestFlight/App Store** installieren
-3. **iCloud Backup** kann Daten wiederherstellen
-
-## 📊 Pipeline Monitoring
-
-### GitHub Actions
-- **Dashboard**: Repository → Actions Tab
-- **Logs**: Detaillierte Build-Logs pro Workflow
-- **Artifacts**: Download verfügbar für 90 Tage
-
-### Pipeline Validation
-```bash
-# Pipeline Validierung lokal ausführen
-./scripts/validate-pipeline.sh
+### Artifact Structure
+```
+Release Assets:
+├── android-apk/
+│   └── NdcApp.apk
+├── windows-msix/
+│   └── NdcApp.msix
+└── ios-app/
+    └── NdcApp.app
 ```
 
-### Metriken
-- **Build Zeit**: Durchschnittlich 15-20 Minuten
-- **Test Coverage**: 99+ Tests
-- **Artifact Größe**: 
-  - Windows MSIX: ~50-80 MB
-  - Android APK: ~30-50 MB
-  - iOS App: ~40-60 MB
+## Distribution
 
-## 🛡️ Sicherheit
+### Android
+- **Development:** Direct APK installation
+- **Production:** Google Play Store (requires signing)
+
+### Windows
+- **Development:** Sideload MSIX package
+- **Production:** Microsoft Store or enterprise distribution
+
+### iOS
+- **Development:** TestFlight or direct installation (requires provisioning)
+- **Production:** App Store (requires Apple Developer Account)
+
+## Rollback Strategy
+
+### Git-Based Rollback
+1. **Identify Last Good Release:**
+   ```bash
+   git tag --list --sort=-version:refname
+   ```
+
+2. **Create Rollback Release:**
+   ```bash
+   git tag v1.0.1-rollback [previous-good-commit]
+   git push origin v1.0.1-rollback
+   ```
+
+3. **Emergency Hotfix:**
+   - Create hotfix branch from last good release
+   - Apply minimal fix
+   - Create new release tag
+
+### Platform-Specific Rollback
+
+#### Android
+- Revert to previous APK version
+- Use Google Play Console rollback (if published)
+
+#### Windows
+- Uninstall current MSIX
+- Install previous MSIX version
+- Use Microsoft Store rollback (if published)
+
+#### iOS
+- Use App Store rollback functionality
+- Deploy previous IPA for enterprise
+
+### Monitoring
+- Monitor release workflows in GitHub Actions
+- Check build status before deployment
+- Test artifacts before distribution
+
+## Security Considerations
 
 ### Code Signing
-- **Windows**: MSIX Pakete können signiert werden
-- **Android**: APK Signierung optional für Sideloading
-- **iOS**: Zwingend erforderlich für Distribution
+- **Android:** Configure signing keys for Play Store
+- **Windows:** Certificate required for production MSIX
+- **iOS:** Apple Developer certificates required
 
-### Dependency Management
-- **Dependabot**: Automatische Updates für NuGet und GitHub Actions
-- **Security Alerts**: GitHub Security Advisories aktiviert
-- **Vulnerability Scanning**: Integriert in CI/CD Pipeline
+### Secrets Management
+Store sensitive data in GitHub Secrets:
+- `ANDROID_KEYSTORE` - Android signing keystore
+- `ANDROID_KEY_ALIAS` - Keystore alias
+- `ANDROID_KEY_PASSWORD` - Key password
+- `IOS_CERTIFICATE` - iOS distribution certificate
+- `IOS_PROVISIONING_PROFILE` - iOS provisioning profile
 
-## 📚 Weitere Ressourcen
+## Troubleshooting
 
-- **Build Documentation**: `BUILD.md`
-- **Security Policy**: `SECURITY.md`
-- **User Manual**: `BENUTZERHANDBUCH.md`
-- **Feature Overview**: `FEATURES.md`
-- **Roadmap**: `ROADMAP.md`
+### Common Build Issues
+
+#### MAUI Workload Missing
+```bash
+dotnet workload install maui
+```
+
+#### Platform SDK Missing
+- **Android:** Install Android SDK via Visual Studio or Android Studio
+- **iOS:** Install Xcode on macOS
+- **Windows:** Windows SDK included with Visual Studio
+
+#### Build Failures
+1. Check GitHub Actions logs
+2. Verify project file syntax
+3. Ensure all dependencies are restored
+4. Check platform-specific requirements
+
+### Support
+- GitHub Issues for build problems
+- Documentation updates via pull requests
+- Release process improvements via GitHub Discussions
 
 ---
 
-*Für Support oder Fragen zur Deployment-Pipeline, bitte ein Issue auf GitHub erstellen.*
+*Last updated: January 2025*

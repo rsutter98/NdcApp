@@ -19,12 +19,6 @@
         <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
 
-        <!-- Required for .NET MAUI Class Libraries -->
-        <UseMauiEssentials>true</UseMauiEssentials>
-        
-        <!-- Deployment optimizations -->
-        <TrimMode>copyused</TrimMode>
-        <PublishTrimmed>true</PublishTrimmed>
 
         <!-- Windows packaging configuration -->
         <WindowsPackageType>MSIX</WindowsPackageType>
