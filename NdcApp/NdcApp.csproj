@@ -10,14 +10,15 @@
         <Nullable>enable</Nullable>
 
         <!-- Display name -->
-        <ApplicationTitle>NdcApp</ApplicationTitle>
+        <ApplicationTitle>NDC Conference Planner</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.ndcapp</ApplicationId>
+        <ApplicationId>com.ndcapp.conferenceplanner</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
+
 
         <!-- Windows packaging configuration -->
         <WindowsPackageType>MSIX</WindowsPackageType>

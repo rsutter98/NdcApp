@@ -24,6 +24,7 @@ Every pull request triggers automated testing:
 - `develop` - Development branch
 - Feature branches trigger CI on PR
 
+
 ## Continuous Deployment (CD)
 
 ### Release Process
@@ -33,10 +34,12 @@ Releases are triggered by:
 
 **Workflow:** `.github/workflows/release.yml`
 
+
 ### Platform Builds
 
 #### Android APK
 - **Framework:** `net8.0-android`
+
 - **Output:** APK file
 - **Location:** `NdcApp/bin/Release/net8.0-android/publish/`
 - **Runner:** Ubuntu Latest

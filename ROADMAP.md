@@ -45,14 +45,15 @@ Diese Roadmap dokumentiert die nächsten Entwicklungsschritte für die NdcApp, e
   - UI-Workflow dokumentieren
 
 ### 3. Deployment vorbereiten
-- [ ] **Platform-spezifische Builds**
-  - Android APK-Build konfigurieren
-  - Windows MSIX-Package erstellen
-  - iOS Build (falls Bedarf)
-- [ ] **Release-Pipeline**
-  - GitHub Actions für CI/CD aufsetzen
-  - Automatische Tests bei PR
-  - Release-Artifacts generieren
+- [x] **Platform-spezifische Builds**
+  - ✅ Android APK-Build konfiguriert
+  - ✅ Windows MSIX-Package erstellt
+  - ⏳ iOS Build (falls Bedarf)
+- [x] **Release-Pipeline**
+  - ✅ GitHub Actions für CI/CD aufgesetzt
+  - ✅ Automatische Tests bei PR
+  - ✅ Release-Artifacts generieren
+  - ✅ Manueller Deployment-Script verfügbar
 
 ---
 
