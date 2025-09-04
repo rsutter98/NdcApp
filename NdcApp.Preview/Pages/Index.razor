@@ -1,0 +1,268 @@
+@page "/"
+@using NdcApp.Core.Services
+@using NdcApp.Core.Models
+@inject ITalkService TalkService
+@inject IConferencePlanService ConferencePlanService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>NDC Copenhagen - Home</PageTitle>
+
+<div class="home-container">
+    <div class="container">
+        <div class="hero-section">
+            <div class="hero-content">
+                <img src="images/dotnet_bot.svg" class="hero-image" alt="NDC Bot" />
+                <h1 class="hero-title">NDC Copenhagen</h1>
+                <p class="hero-subtitle">Experience the future of software!</p>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-item">
+                    <strong>Current Time:</strong> @DateTime.Now.ToString("HH:mm")
+                </div>
+                <div class="status-item">
+                    <strong>Next Talk:</strong> @(nextTalk?.Title ?? "No upcoming talks")
+                    @if (nextTalk != null)
+                    {
+                        <br><small>@nextTalk.Speaker in Room @nextTalk.Room</small>
+                    }
+                </div>
+                <div class="status-item">
+                    <strong>Total Talks:</strong> @totalTalks
+                </div>
+                <div class="status-item">
+                    <strong>Selected Talks:</strong> @selectedTalksCount
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-section">
+            <a href="/conference-plan" class="cta-button">
+                Go to My Conference Plan
+            </a>
+            
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <h3>@totalTalks</h3>
+                    <p>Total Talks</p>
+                </div>
+                <div class="stat-card">
+                    <h3>@selectedTalksCount</h3>
+                    <p>In My Plan</p>
+                </div>
+                <div class="stat-card">
+                    <h3>@uniqueSpeakers</h3>
+                    <p>Speakers</p>
+                </div>
+                <div class="stat-card">
+                    <h3>@uniqueRooms</h3>
+                    <p>Rooms</p>
+                </div>
+            </div>
+        </div>
+        
+        @if (errorMessage != null)
+        {
+            <div class="alert alert-warning">
+                <strong>Note:</strong> @errorMessage
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<Talk> allTalks = new();
+    private Talk? nextTalk;
+    private int totalTalks;
+    private int selectedTalksCount;
+    private int uniqueSpeakers;
+    private int uniqueRooms;
+    private string? errorMessage;
+
+    protected override Task OnInitializedAsync()
+    {
+        try
+        {
+            // Load talks from CSV
+            var csvPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "ndc.csv");
+            if (File.Exists(csvPath))
+            {
+                allTalks = TalkService.LoadTalks(csvPath);
+            }
+            else
+            {
+                errorMessage = "Conference data not found. This is a preview with limited functionality.";
+                // Create some sample data for demo
+                allTalks = CreateSampleTalks();
+            }
+            
+            // Update statistics
+            UpdateStatistics();
+            
+            // Set up a timer to update current time every minute
+            var timer = new System.Timers.Timer(60000);
+            timer.Elapsed += async (sender, e) => await InvokeAsync(StateHasChanged);
+            timer.Start();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading conference data: {ex.Message}";
+            allTalks = CreateSampleTalks();
+            UpdateStatistics();
+        }
+        
+        return Task.CompletedTask;
+    }
+
+    private void UpdateStatistics()
+    {
+        totalTalks = allTalks.Count;
+        selectedTalksCount = ConferencePlanService.GetSelectedTalks().Count;
+        uniqueSpeakers = allTalks.Select(t => t.Speaker).Distinct().Count();
+        uniqueRooms = allTalks.Select(t => t.Room).Distinct().Count();
+        nextTalk = ConferencePlanService.GetNextSelectedTalk();
+    }
+
+    private List<Talk> CreateSampleTalks()
+    {
+        return new List<Talk>
+        {
+            new Talk 
+            { 
+                Day = "Wednesday", 
+                StartTime = TimeSpan.FromHours(9), 
+                EndTime = TimeSpan.FromHours(10),
+                Room = "1",
+                Title = "Keynote: AI is having its moment ... again",
+                Speaker = "Jodie Burchell",
+                Category = "Talk"
+            },
+            new Talk 
+            { 
+                Day = "Wednesday", 
+                StartTime = TimeSpan.FromHours(10.33), 
+                EndTime = TimeSpan.FromHours(11.33),
+                Room = "1",
+                Title = "Java Sucks (So C# Didn't Have To)",
+                Speaker = "Adele Carpenter",
+                Category = "Talk"
+            },
+            new Talk 
+            { 
+                Day = "Wednesday", 
+                StartTime = TimeSpan.FromHours(10.33), 
+                EndTime = TimeSpan.FromHours(11.33),
+                Room = "2",
+                Title = "Navigating complexity in event-driven architectures",
+                Speaker = "David Boyne",
+                Category = "Talk"
+            }
+        };
+    }
+}
+
+<style>
+    .home-container {
+        min-height: 80vh;
+    }
+
+    .hero-section {
+        text-align: center;
+        margin: 2rem 0;
+    }
+
+    .hero-content {
+        margin-bottom: 2rem;
+    }
+
+    .hero-image {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 1rem;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #FFB400;
+        margin: 1rem 0;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        color: #FFFFFF;
+        margin-bottom: 2rem;
+    }
+
+    .status-card {
+        background: rgba(255, 180, 0, 0.1);
+        border: 2px solid #FFB400;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin: 2rem auto;
+        max-width: 600px;
+    }
+
+    .status-item {
+        margin: 0.75rem 0;
+        font-size: 1rem;
+    }
+
+    .action-section {
+        text-align: center;
+        margin: 2rem 0;
+    }
+
+    .cta-button {
+        display: inline-block;
+        background: #FFB400;
+        color: #0A2342;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: all 0.2s;
+        margin-bottom: 2rem;
+    }
+
+    .cta-button:hover {
+        background: #e69f00;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .stat-card h3 {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #FFB400;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .stat-card p {
+        margin: 0;
+        color: #FFFFFF;
+    }
+
+    .alert {
+        background: rgba(255, 193, 7, 0.2);
+        border: 1px solid #ffc107;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+</style>

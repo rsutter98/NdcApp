@@ -1,0 +1,596 @@
+@page "/conference-plan"
+@using NdcApp.Core.Services
+@using NdcApp.Core.Models
+@inject ITalkService TalkService
+@inject IConferencePlanService ConferencePlanService
+@inject ITalkFilterService TalkFilterService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>My Conference Plan</PageTitle>
+
+<div class="conference-plan-container">
+    <div class="container">
+        <header class="page-header">
+            <h1 class="page-title">Conference Plan</h1>
+            <div class="filters">
+                <select @bind="selectedDay" @bind:event="onchange" class="filter-select">
+                    <option value="">All Days</option>
+                    @foreach (var day in availableDays)
+                    {
+                        <option value="@day">@day</option>
+                    }
+                </select>
+                
+                <select @bind="selectedCategory" @bind:event="onchange" class="filter-select">
+                    <option value="">All Categories</option>
+                    @foreach (var category in availableCategories)
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </select>
+                
+                <input type="text" @bind="searchText" @bind:event="oninput" 
+                       placeholder="Search talks..." class="search-input" />
+            </div>
+        </header>
+
+        <div class="plan-summary">
+            <div class="summary-stats">
+                <div class="stat">
+                    <span class="stat-number">@selectedTalks.Count</span>
+                    <span class="stat-label">Selected</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">@filteredTalks.Count</span>
+                    <span class="stat-label">Available</span>
+                </div>
+            </div>
+            
+            @if (selectedTalks.Any())
+            {
+                <button class="btn btn-outline" @onclick="ClearAllSelections">
+                    Clear All Selections
+                </button>
+            }
+        </div>
+
+        <div class="talks-grid">
+            @foreach (var talk in filteredTalks)
+            {
+                <div class="talk-card @(ConferencePlanService.IsTalkSelected(talk) ? "selected" : "")">
+                    <div class="talk-header">
+                        <h3 class="talk-title">@talk.Title</h3>
+                        <div class="talk-meta">
+                            <span class="talk-time">@talk.Day @talk.StartTime.ToString(@"hh\:mm") - @talk.EndTime.ToString(@"hh\:mm")</span>
+                            <span class="talk-room">Room @talk.Room</span>
+                        </div>
+                    </div>
+                    
+                    <div class="talk-body">
+                        <p class="talk-speaker">@talk.Speaker</p>
+                        <span class="talk-category">@talk.Category</span>
+                        
+                        @if (talk.AverageRating > 0)
+                        {
+                            <div class="talk-rating">
+                                <span class="rating-stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span class="star @(i <= talk.AverageRating ? "filled" : "")">★</span>
+                                    }
+                                </span>
+                                <span class="rating-text">@talk.AverageRating.ToString("F1") (@talk.RatingCount reviews)</span>
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="talk-actions">
+                        <button class="btn @(ConferencePlanService.IsTalkSelected(talk) ? "btn-selected" : "btn-primary")" 
+                                @onclick="() => ToggleTalkSelection(talk)">
+                            @(ConferencePlanService.IsTalkSelected(talk) ? "Remove from Plan" : "Add to Plan")
+                        </button>
+                        
+                        <button class="btn btn-secondary" @onclick="() => ShowRatingDialog(talk)">
+                            Rate Talk
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (showRatingDialog && selectedTalkForRating != null)
+        {
+            <div class="modal-overlay" @onclick="CloseRatingDialog">
+                <div class="modal-content" @onclick:stopPropagation="true">
+                    <h3>Rate "@selectedTalkForRating.Title"</h3>
+                    <div class="rating-selector">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            var rating = i;
+                            <button class="star-button @(rating <= newRating ? "selected" : "")" 
+                                    @onclick="() => SetRating(rating)">
+                                ★
+                            </button>
+                        }
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" @onclick="SubmitRating">Submit Rating</button>
+                        <button class="btn btn-secondary" @onclick="CloseRatingDialog">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<Talk> allTalks = new();
+    private List<Talk> filteredTalks = new();
+    private List<Talk> selectedTalks = new();
+    private List<string> availableDays = new();
+    private List<string> availableCategories = new();
+    
+    private string _selectedDay = "";
+    private string _selectedCategory = "";
+    private string _searchText = "";
+    
+    private string selectedDay 
+    { 
+        get => _selectedDay; 
+        set 
+        { 
+            _selectedDay = value; 
+            FilterTalks(); 
+        } 
+    }
+    
+    private string selectedCategory 
+    { 
+        get => _selectedCategory; 
+        set 
+        { 
+            _selectedCategory = value; 
+            FilterTalks(); 
+        } 
+    }
+    
+    private string searchText 
+    { 
+        get => _searchText; 
+        set 
+        { 
+            _searchText = value; 
+            FilterTalks(); 
+        } 
+    }
+    
+    private bool showRatingDialog = false;
+    private Talk? selectedTalkForRating;
+    private int newRating = 0;
+
+    protected override Task OnInitializedAsync()
+    {
+        return LoadTalks().ContinueWith(_ => FilterTalks());
+    }
+
+    private Task LoadTalks()
+    {
+        try
+        {
+            var csvPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "ndc.csv");
+            if (File.Exists(csvPath))
+            {
+                allTalks = TalkService.LoadTalks(csvPath);
+            }
+            else
+            {
+                // Create sample data for demo
+                allTalks = CreateSampleTalks();
+            }
+            
+            // Update all talk ratings
+            ConferencePlanService.UpdateAllTalkRatings(allTalks);
+            
+            // Get available filter options
+            availableDays = allTalks.Select(t => t.Day).Distinct().OrderBy(d => d).ToList();
+            availableCategories = allTalks.Select(t => t.Category).Distinct().OrderBy(c => c).ToList();
+            
+            // Get selected talks
+            selectedTalks = ConferencePlanService.GetSelectedTalks();
+        }
+        catch (Exception)
+        {
+            // Handle error - could show a message to user
+            allTalks = CreateSampleTalks();
+            availableDays = allTalks.Select(t => t.Day).Distinct().OrderBy(d => d).ToList();
+            availableCategories = allTalks.Select(t => t.Category).Distinct().OrderBy(c => c).ToList();
+        }
+        
+        return Task.CompletedTask;
+    }
+
+    private void FilterTalks()
+    {
+        var filtered = allTalks.AsEnumerable();
+        
+        // Filter by day
+        if (!string.IsNullOrEmpty(_selectedDay))
+        {
+            filtered = filtered.Where(t => t.Day == _selectedDay);
+        }
+        
+        // Filter by category
+        if (!string.IsNullOrEmpty(_selectedCategory))
+        {
+            filtered = filtered.Where(t => t.Category == _selectedCategory);
+        }
+        
+        // Filter by search text
+        if (!string.IsNullOrEmpty(_searchText))
+        {
+            filtered = TalkFilterService.FilterTalks(filtered.ToList(), _searchText);
+        }
+        
+        filteredTalks = filtered.ToList();
+        selectedTalks = ConferencePlanService.GetSelectedTalks();
+        StateHasChanged();
+    }
+
+    private void ToggleTalkSelection(Talk talk)
+    {
+        if (ConferencePlanService.IsTalkSelected(talk))
+        {
+            ConferencePlanService.DeselectTalk(talk);
+        }
+        else
+        {
+            ConferencePlanService.SelectTalk(talk);
+        }
+        
+        selectedTalks = ConferencePlanService.GetSelectedTalks();
+        StateHasChanged();
+    }
+
+    private void ClearAllSelections()
+    {
+        ConferencePlanService.ClearSelectedTalks();
+        selectedTalks = ConferencePlanService.GetSelectedTalks();
+        StateHasChanged();
+    }
+
+    private void ShowRatingDialog(Talk talk)
+    {
+        selectedTalkForRating = talk;
+        newRating = 0;
+        showRatingDialog = true;
+    }
+
+    private void CloseRatingDialog()
+    {
+        showRatingDialog = false;
+        selectedTalkForRating = null;
+        newRating = 0;
+    }
+
+    private void SetRating(int rating)
+    {
+        newRating = rating;
+    }
+
+    private void SubmitRating()
+    {
+        if (selectedTalkForRating != null && newRating > 0)
+        {
+            ConferencePlanService.RateTalk(selectedTalkForRating, newRating);
+            ConferencePlanService.UpdateAllTalkRatings(allTalks);
+            CloseRatingDialog();
+            StateHasChanged();
+        }
+    }
+
+    private List<Talk> CreateSampleTalks()
+    {
+        return new List<Talk>
+        {
+            new Talk 
+            { 
+                Day = "Wednesday", 
+                StartTime = TimeSpan.FromHours(9), 
+                EndTime = TimeSpan.FromHours(10),
+                Room = "1",
+                Title = "Keynote: AI is having its moment ... again",
+                Speaker = "Jodie Burchell",
+                Category = "Talk"
+            },
+            new Talk 
+            { 
+                Day = "Wednesday", 
+                StartTime = TimeSpan.FromHours(10.33), 
+                EndTime = TimeSpan.FromHours(11.33),
+                Room = "1",
+                Title = "Java Sucks (So C# Didn't Have To)",
+                Speaker = "Adele Carpenter",
+                Category = "Talk"
+            },
+            new Talk 
+            { 
+                Day = "Wednesday", 
+                StartTime = TimeSpan.FromHours(10.33), 
+                EndTime = TimeSpan.FromHours(11.33),
+                Room = "2",
+                Title = "Navigating complexity in event-driven architectures",
+                Speaker = "David Boyne",
+                Category = "Talk"
+            },
+            new Talk 
+            { 
+                Day = "Thursday", 
+                StartTime = TimeSpan.FromHours(9), 
+                EndTime = TimeSpan.FromHours(10),
+                Room = "1",
+                Title = "Better Code Reviews FTW!",
+                Speaker = "Tess Ferrandez-Norlander",
+                Category = "Talk"
+            },
+            new Talk 
+            { 
+                Day = "Thursday", 
+                StartTime = TimeSpan.FromHours(14), 
+                EndTime = TimeSpan.FromHours(15),
+                Room = "3",
+                Title = "Using GenAI on and inside your code",
+                Speaker = "Niels Tanis",
+                Category = "Workshop"
+            }
+        };
+    }
+}
+
+<style>
+    .conference-plan-container {
+        min-height: 80vh;
+    }
+
+    .page-header {
+        margin: 2rem 0;
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #FFB400;
+        margin-bottom: 1.5rem;
+    }
+
+    .filters {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    .filter-select, .search-input {
+        padding: 0.5rem;
+        border: 1px solid #FFB400;
+        border-radius: 0.25rem;
+        background: rgba(255, 255, 255, 0.1);
+        color: #FFFFFF;
+        min-width: 150px;
+    }
+
+    .filter-select option {
+        background: #0A2342;
+        color: #FFFFFF;
+    }
+
+    .plan-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 2rem 0;
+        padding: 1rem;
+        background: rgba(255, 180, 0, 0.1);
+        border-radius: 0.5rem;
+    }
+
+    .summary-stats {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .stat {
+        text-align: center;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #FFB400;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #FFFFFF;
+    }
+
+    .talks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .talk-card {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid transparent;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.2s;
+    }
+
+    .talk-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .talk-card.selected {
+        border-color: #FFB400;
+        background: rgba(255, 180, 0, 0.2);
+    }
+
+    .talk-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #FFB400;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .talk-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #CCCCCC;
+    }
+
+    .talk-speaker {
+        font-style: italic;
+        color: #FFFFFF;
+        margin: 0.5rem 0;
+    }
+
+    .talk-category {
+        background: rgba(255, 180, 0, 0.3);
+        color: #FFB400;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.8rem;
+    }
+
+    .talk-rating {
+        margin: 0.5rem 0;
+        font-size: 0.9rem;
+    }
+
+    .rating-stars .star {
+        color: #FFB400;
+        margin-right: 2px;
+    }
+
+    .rating-stars .star:not(.filled) {
+        color: #666;
+    }
+
+    .talk-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.25rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: #FFB400;
+        color: #0A2342;
+    }
+
+    .btn-primary:hover {
+        background: #e69f00;
+    }
+
+    .btn-selected {
+        background: #dc3545;
+        color: #FFFFFF;
+    }
+
+    .btn-selected:hover {
+        background: #c82333;
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.2);
+        color: #FFFFFF;
+        border: 1px solid #FFFFFF;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: #FFB400;
+        border: 1px solid #FFB400;
+    }
+
+    .btn-outline:hover {
+        background: #FFB400;
+        color: #0A2342;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: #0A2342;
+        border: 2px solid #FFB400;
+        border-radius: 1rem;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+    }
+
+    .modal-content h3 {
+        color: #FFB400;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .rating-selector {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .star-button {
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: #666;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .star-button:hover,
+    .star-button.selected {
+        color: #FFB400;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+</style>

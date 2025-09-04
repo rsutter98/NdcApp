@@ -8,6 +8,7 @@ The NdcApp is a .NET MAUI cross-platform application that can be deployed to:
 - **Android** (APK)
 - **Windows** (MSIX Package)
 - **iOS** (App Store/Enterprise)
+- **Web Preview** (Blazor Server - for demonstration)
 
 ## Continuous Integration (CI)
 
@@ -16,8 +17,10 @@ Every pull request triggers automated testing:
 - Build verification across all projects
 - Unit test execution (99+ tests)
 - Test result artifacts
+- **Preview deployment** for web-based testing
 
 **Workflow:** `.github/workflows/ci.yml`
+**Preview Workflow:** `.github/workflows/preview.yml`
 
 ### Branches
 - `main` - Production branch
@@ -33,6 +36,26 @@ Releases are triggered by:
 2. **Manual Trigger**: Use GitHub Actions manual dispatch
 
 **Workflow:** `.github/workflows/release.yml`
+
+## Preview Deployment (Web)
+
+### Web-Based Preview
+A Blazor Server application that replicates the MAUI app functionality for browser-based demonstration:
+- **Framework:** `net8.0` (ASP.NET Core)
+- **Output:** Docker container
+- **Location:** `NdcApp.Preview/`
+- **Runner:** Docker container
+- **Access:** http://localhost:8080 (local), configurable for production
+
+#### Features
+- ✅ Conference talk browsing and filtering
+- ✅ Personal schedule management
+- ✅ Talk rating system (1-5 stars)
+- ✅ Real-time statistics and updates
+- ✅ Responsive web design
+- ✅ Same core business logic as MAUI app
+
+**See:** [PREVIEW.md](PREVIEW.md) for detailed preview deployment documentation
 
 
 ### Platform Builds

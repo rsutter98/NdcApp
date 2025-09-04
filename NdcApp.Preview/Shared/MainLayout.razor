@@ -1,0 +1,109 @@
+@inherits LayoutComponentBase
+@using NdcApp.Core.Services
+
+<div class="ndc-app">
+    <header class="ndc-header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <img src="images/dotnet_bot.svg" alt="NDC" height="40" />
+                    <span class="brand-text">NDC Conference Planner</span>
+                    <span class="preview-badge">PREVIEW</span>
+                </div>
+                <div class="navbar-nav">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/conference-plan" class="nav-link">My Plan</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="ndc-main">
+        @Body
+    </main>
+    
+    <footer class="ndc-footer">
+        <div class="container">
+            <p>&copy; 2025 NDC Conference Planner - Web Preview</p>
+            <p><small>This is a web preview of the MAUI app functionality for demonstration purposes.</small></p>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .ndc-app {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0A2342 0%, #1a3a5c 100%);
+        color: #FFFFFF;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .ndc-header {
+        background: rgba(255, 180, 0, 0.1);
+        border-bottom: 2px solid #FFB400;
+        padding: 1rem 0;
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .brand-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #FFB400;
+    }
+
+    .preview-badge {
+        background: #dc3545;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
+
+    .navbar-nav {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .nav-link {
+        color: #FFFFFF;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        transition: background-color 0.2s;
+    }
+
+    .nav-link:hover {
+        background: rgba(255, 180, 0, 0.2);
+        color: #FFB400;
+    }
+
+    .ndc-main {
+        flex: 1;
+        padding: 2rem 0;
+    }
+
+    .ndc-footer {
+        background: rgba(0, 0, 0, 0.2);
+        border-top: 1px solid rgba(255, 180, 0, 0.3);
+        padding: 1rem 0;
+        text-align: center;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+</style>
