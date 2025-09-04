@@ -1,0 +1,8 @@
+<!-- Placeholder SVG for dotnet bot -->
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <circle cx="60" cy="60" r="50" fill="#FFB400"/>
+  <circle cx="45" cy="45" r="5" fill="#0A2342"/>
+  <circle cx="75" cy="45" r="5" fill="#0A2342"/>
+  <path d="M40 75 Q60 90 80 75" stroke="#0A2342" stroke-width="3" fill="none"/>
+  <text x="60" y="100" text-anchor="middle" font-family="Arial" font-size="10" fill="#0A2342">NDC Bot</text>
+</svg>

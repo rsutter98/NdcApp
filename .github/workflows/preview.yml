@@ -1,0 +1,169 @@
+name: Preview Deployment
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy preview environment'
+        type: boolean
+        default: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/preview
+
+jobs:
+  build-preview:
+    name: Build Preview App
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build Preview App
+      run: dotnet build NdcApp.Preview/NdcApp.Preview.csproj --no-restore --configuration Release
+
+    - name: Test Core Library
+      run: dotnet test NdcApp.Tests/NdcApp.Tests.csproj --no-build --configuration Release --verbosity normal
+
+    - name: Log in to Container Registry
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      if: github.event_name != 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./NdcApp.Preview/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build Docker image for PR
+      if: github.event_name == 'pull_request'
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./NdcApp.Preview/Dockerfile
+        push: false
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+  deploy-preview:
+    name: Deploy Preview Environment
+    runs-on: ubuntu-latest
+    needs: build-preview
+    if: github.event_name != 'pull_request' && (github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    environment:
+      name: preview
+      url: http://preview.ndcapp.local:8080
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Deploy with Docker Compose
+      run: |
+        echo "🚀 Preview deployment would run here!"
+        echo "Docker image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}"
+        echo "Preview URL: http://preview.ndcapp.local:8080"
+        echo ""
+        echo "To deploy locally, run:"
+        echo "docker-compose -f docker-compose.preview.yml up -d"
+        echo ""
+        echo "To access the preview app:"
+        echo "1. Navigate to http://localhost:8080"
+        echo "2. Browse the NDC Conference Planner"
+        echo "3. Test talk selection and rating features"
+
+  comment-pr:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    needs: build-preview
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+    - name: Comment PR
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: pullRequest } = await github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number
+          });
+
+          const comment = `## 🎉 Preview App Built Successfully!
+
+          ### NDC Conference Planner - Web Preview
+
+          The preview version of your MAUI app has been built and is ready for testing!
+
+          ### 🐳 Docker Deployment
+          The preview app is containerized and ready to deploy. Use the following commands:
+
+          \`\`\`bash
+          # Build and run locally
+          docker-compose -f docker-compose.preview.yml up -d
+
+          # Access the app
+          open http://localhost:8080
+          \`\`\`
+
+          ### 🌟 Features Available
+          - ✅ **Conference talk browsing** - View all available talks
+          - ✅ **Personal planning** - Add/remove talks from your plan  
+          - ✅ **Talk ratings** - Rate talks with 1-5 stars
+          - ✅ **Filtering & search** - Filter by day, category, or search text
+          - ✅ **Responsive design** - Works on desktop and mobile
+          - ✅ **Real-time updates** - Live statistics and interactions
+
+          ### 📱 Preview Screenshot
+          ![NDC Conference Planner Preview](https://github.com/user-attachments/assets/7f811830-783d-40dc-bd9c-c31ead19ad66)
+
+          This web preview replicates the core functionality of your MAUI app for easy demonstration and testing purposes.
+
+          ---
+          *Built from commit: ${context.sha.substring(0, 7)}*`;
+
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: comment
+          });

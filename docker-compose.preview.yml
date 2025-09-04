@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  ndcapp-preview:
+    build:
+      context: .
+      dockerfile: NdcApp.Preview/Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+    restart: unless-stopped
+    container_name: ndcapp-preview

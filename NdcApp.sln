@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NdcApp.Core", "NdcApp.Core\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NdcApp.Tests", "NdcApp.Tests\NdcApp.Tests.csproj", "{2470BA5F-D08B-45A2-AB91-A8EBD0ACD7CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NdcApp.Preview", "NdcApp.Preview\NdcApp.Preview.csproj", "{53200AFD-E1F1-4DDE-BCBF-2307BE809FA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,5 +27,9 @@ Global
 		{2470BA5F-D08B-45A2-AB91-A8EBD0ACD7CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2470BA5F-D08B-45A2-AB91-A8EBD0ACD7CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2470BA5F-D08B-45A2-AB91-A8EBD0ACD7CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53200AFD-E1F1-4DDE-BCBF-2307BE809FA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53200AFD-E1F1-4DDE-BCBF-2307BE809FA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53200AFD-E1F1-4DDE-BCBF-2307BE809FA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53200AFD-E1F1-4DDE-BCBF-2307BE809FA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
