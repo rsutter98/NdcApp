@@ -71,7 +71,7 @@ dotnet test --collect:"XPlat Code Coverage"
 
 ## Test Statistics
 
-- **Total Tests**: 52
+- **Total Tests**: 99
 - **Test Classes**: 6
 - **All tests passing**: ✅
 - **Code Coverage**: Comprehensive coverage of all business logic
