@@ -39,8 +39,8 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Build Preview App
-      run: dotnet build NdcApp.Preview/NdcApp.Preview.csproj --no-restore --configuration Release
+    - name: Build Solution
+      run: dotnet build --no-restore --configuration Release
 
     - name: Test Core Library
       run: dotnet test NdcApp.Tests/NdcApp.Tests.csproj --no-build --configuration Release --verbosity normal
@@ -107,9 +107,13 @@ jobs:
         echo "docker-compose -f docker-compose.preview.yml up -d"
         echo ""
         echo "To access the preview app:"
-        echo "1. Navigate to http://localhost:8080"
-        echo "2. Browse the NDC Conference Planner"
-        echo "3. Test talk selection and rating features"
+        echo "1. Navigate to http://localhost:8080 on the same computer"
+        echo "2. To access from iPhone/mobile devices:"
+        echo "   - Find your computer's IP address (e.g., 192.168.1.100)"
+        echo "   - Navigate to http://YOUR_IP:8080 on your iPhone"
+        echo "   - Example: http://192.168.1.100:8080"
+        echo "3. Browse the NDC Conference Planner"
+        echo "4. Test talk selection and rating features"
 
   comment-pr:
     name: Comment on PR
@@ -144,9 +148,20 @@ jobs:
           # Build and run locally
           docker-compose -f docker-compose.preview.yml up -d
 
-          # Access the app
+          # Access the app locally
           open http://localhost:8080
+          
+          # For iPhone/mobile access:
+          # 1. Find your computer's IP address (ipconfig/ifconfig)
+          # 2. Access http://YOUR_IP:8080 from your iPhone
+          # Example: http://192.168.1.100:8080
           \`\`\`
+
+          ### 📱 iPhone Access
+          - ✅ **Network access enabled** - App binds to all network interfaces
+          - ✅ **Mobile responsive** - Web UI adapts to mobile screens  
+          - ✅ **Touch optimized** - Optimized for touch interactions
+          - 🔧 **Setup required** - Ensure both devices are on same WiFi network
 
           ### 🌟 Features Available
           - ✅ **Conference talk browsing** - View all available talks
