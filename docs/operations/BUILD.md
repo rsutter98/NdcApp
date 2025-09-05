@@ -1,8 +1,5 @@
 # Build & Deployment Pipeline
 
-> **📚 Note**: This document has been moved to the new documentation structure.  
-> **🔗 Latest Version**: See [docs/operations/BUILD.md](docs/operations/BUILD.md)
-
 Quick reference for building and deploying the NdcApp.
 
 ## 🚀 Quick Start

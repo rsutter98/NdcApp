@@ -2,18 +2,37 @@
 
 [![CI/CD Pipeline](https://github.com/rsutter98/NdcApp/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/rsutter98/NdcApp/actions/workflows/ci-cd.yml)
 [![Tests](https://img.shields.io/badge/tests-99%20passing-success)](https://github.com/rsutter98/NdcApp/actions)
-[![Platform](https://img.shields.io/badge/platform-Windows%20|%20Android-lightgrey)](#-deployment)
+[![Platform](https://img.shields.io/badge/platform-Windows%20|%20Android%20|%20iOS-lightgrey)](#-deployment)
+[![License](https://img.shields.io/badge/license-MIT-blue)](#license)
+
+A .NET MAUI cross-platform application for conference planning and session management.
 
 Eine .NET MAUI-Anwendung zur Planung und Verwaltung von Konferenzteilnahmen.
 
-## 🚀 Features
+## 📚 Documentation
 
-- **CSV-Import**: Lade Konferenz-Talks aus CSV-Dateien
-- **Talk-Auswahl**: Wähle interessante Talks für deinen persönlichen Plan
-- **Sortierung**: Sortiere nach Sprecher, Kategorie oder chronologisch
-- **Persistierung**: Deine Auswahl wird automatisch gespeichert
-- **Nächster Talk**: Siehe auf einen Blick, welcher Talk als nächstes ansteht
-- **NDC-Design**: Ansprechendes UI im NDC-Corporate-Design
+- **📖 [Complete Documentation](docs/README.md)** - Organized documentation structure
+- **🚀 [Quick Start Guide](docs/user-guide/QUICK_START.md)** - Get started in 5 minutes
+- **👨‍💻 [Developer Guide](docs/developer-guide/README.md)** - Development setup and guidelines
+- **🔧 [Build Instructions](BUILD.md)** - How to build and deploy
+- **📋 [User Manual](BENUTZERHANDBUCH.md)** - Detailed user guide (German)
+
+## 🎯 Quick Overview
+
+NdcApp helps conference attendees plan their schedule, discover talks, and manage their conference experience efficiently.
+
+### ✨ Key Features
+
+- **🗂️ CSV Import**: Load conference talks from CSV files
+- **📅 Talk Selection**: Choose interesting talks for your personal schedule
+- **🔄 Smart Sorting**: Sort by speaker, category, time, or rating
+- **💾 Auto-Save**: Your selections are automatically persisted
+- **⏰ Next Talk**: See at a glance which talk is coming up next
+- **🎨 NDC Design**: Beautiful UI with authentic NDC corporate design
+- **⭐ Talk Ratings**: Rate talks and see community ratings
+- **🔍 Advanced Search**: Find talks by title, speaker, category, or room
+- **🔔 Notifications**: Get reminded about upcoming talks
+- **📱 Cross-Platform**: Works on Windows, Android, and iOS
 
 ## 📱 Screenshots und UI-Übersicht
 
@@ -90,25 +109,76 @@ Die Hauptarbeitsseite für die Talk-Verwaltung:
 - **Swipe-Gesten**: Wischen nach rechts für schnelle Talk-Auswahl
 - **Pull-to-Refresh**: Ziehen Sie nach unten um Daten zu aktualisieren
 
-## 🏗️ Projektstruktur
+## 🏗️ Project Structure
 
 ```
 NdcApp/
-├── NdcApp/                 # Haupt-MAUI-Anwendung
-│   ├── MainPage.xaml       # Startseite mit Next-Talk-Info
-│   ├── ConferencePlanPage.xaml # Talk-Auswahl und -Verwaltung
-│   └── Converters/         # UI-Konverter
-├── NdcApp.Core/           # Business Logic
-│   ├── Models/            # Talk-Datenmodell
-│   └── Services/          # CSV-Service, Plan-Service
-└── NdcApp.Tests/          # Umfangreiche Test-Suite (52 Tests)
+├── NdcApp/                 # Main MAUI Application
+│   ├── MainPage.xaml       # Start page with next talk info
+│   ├── ConferencePlanPage.xaml # Talk selection and management
+│   └── Converters/         # UI Converters
+├── NdcApp.Core/           # Business Logic Library
+│   ├── Models/            # Talk data model
+│   └── Services/          # CSV service, plan service
+├── NdcApp.Preview/        # Blazor Web Preview
+├── NdcApp.Tests/          # Comprehensive Test Suite (99 tests)
+└── docs/                  # Organized Documentation
 ```
 
-## 📖 Benutzerhandbuch
+### 🧪 Test Coverage
+- **99 Tests** - All passing ✅
+- **6 Test Classes** - Comprehensive coverage
+- **Integration Tests** - End-to-end scenarios
+- **Unit Tests** - All business logic covered
+- **Real Data Tests** - Validated with actual NDC data
 
-> 📋 **Ausführliche Anleitung**: Für eine detaillierte Schritt-für-Schritt Anleitung siehe [BENUTZERHANDBUCH.md](BENUTZERHANDBUCH.md)
+## 🚀 Quick Start
 
-### Erste Schritte
+### Installation
+Download the latest release for your platform:
+
+- **Windows**: Download `.msix` from [Releases](https://github.com/rsutter98/NdcApp/releases)
+- **Android**: Download `.apk` from [Releases](https://github.com/rsutter98/NdcApp/releases)
+- **iOS**: Use TestFlight or install via Xcode
+
+> **📋 Detailed Instructions**: See [Installation Guide](docs/user-guide/INSTALLATION.md) for step-by-step instructions.
+
+### First Steps
+1. **Launch the app** - Start NdcApp on your device
+2. **Main page** - You'll see the current time and your next talk
+3. **Conference Plan** - Tap "Go to My Conference Plan" to manage talks
+4. **Search & Select** - Find interesting talks and add them to your schedule
+
+> **📖 Complete Guide**: For detailed usage instructions, see [User Manual](BENUTZERHANDBUCH.md) (German) or [User Guide](docs/user-guide/README.md) (English).
+
+## 🔧 For Developers
+
+### Prerequisites
+- .NET 8.0 SDK
+- Visual Studio 2022 or VS Code
+- MAUI Workloads installed
+
+### Build & Run
+```bash
+# Clone the repository
+git clone https://github.com/rsutter98/NdcApp.git
+cd NdcApp
+
+# Restore dependencies and build
+dotnet build
+
+# Run tests
+dotnet test
+
+# Run the app (specific platform)
+dotnet run --project NdcApp/NdcApp.csproj
+```
+
+> **🔧 Detailed Setup**: See [Developer Guide](docs/developer-guide/README.md) for complete development setup.
+
+---
+
+## 📖 Detailed User Guide (German)
 
 **1. App-Start**
 - Starten Sie die NdcApp auf Ihrem Gerät
@@ -269,7 +339,7 @@ Monday,10:30,11:30,Room B,Building Modern APIs,Jane Smith,Backend
 
 Das Projekt verfügt über eine umfangreiche Test-Suite:
 
-- **52 Tests** decken alle Core-Funktionalitäten ab
+- **99 Tests** decken alle Core-Funktionalitäten ab
 - **Unit Tests** für Business Logic
 - **Integration Tests** für End-to-End-Szenarien
 - **UI-Converter Tests** für XAML-Bindings
@@ -438,50 +508,66 @@ dotnet publish -f net8.0-android -c Release
 - XAML-Binding-Warnungen (geplant zu beheben)
 - Performance bei sehr großen CSV-Dateien nicht getestet
 
-## 🗺️ Roadmap
+## 🗺️ Roadmap & Features
 
-Siehe [ROADMAP.md](ROADMAP.md) für detaillierte Informationen zu geplanten Features und nächsten Schritten.
+- **📋 [Full Roadmap](ROADMAP.md)** - Detailed development plan and next steps
+- **🚀 [Feature Catalog](FEATURES.md)** - Complete list of current and planned features
+- **📈 [Current Status](ROADMAP.md#-aktueller-status-stand-januar-2025)** - What's working now
 
-### Nächste Features
-- Such-/Filter-Funktionalität
-- Push-Benachrichtigungen für anstehende Talks
-- Dark Mode
-- Multi-Konferenz-Unterstützung
+### Next Major Features
+- Enhanced search and filtering
+- Advanced notification system  
+- Dark mode support
+- Multi-conference support
+- Offline mode capabilities
 
-## 🤝 Beitragen
+## 🤝 Contributing
 
-1. Fork das Repository
-2. Erstelle einen Feature-Branch (`git checkout -b feature/amazing-feature`)
-3. Committe deine Änderungen (`git commit -m 'Add amazing feature'`)
-4. Push zum Branch (`git push origin feature/amazing-feature`)
-5. Öffne eine Pull Request
+We welcome contributions! Please see our [Contributing Guide](docs/developer-guide/CONTRIBUTING.md) for details.
 
-### Entwicklungsrichtlinien
+### Quick Start for Contributors
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes with tests
+4. Commit your changes (`git commit -m 'Add amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
 
-- Alle neuen Features benötigen Tests
-- Code-Style entsprechend bestehender Konventionen
-- XAML-Bindings mit x:DataType für Performance
-- Deutsche Kommentare und UI-Texte (NDC Copenhagen Context)
+### Development Guidelines
+- All new features require tests (we maintain 99 passing tests)
+- Follow existing code style and conventions
+- Use XAML bindings with x:DataType for performance
+- Update documentation for any user-facing changes
 
-## 📄 Lizenz
+## 📞 Support & Community
 
-*Lizenz-Information folgt*
+### Getting Help
+- **🐛 [Report Bugs](https://github.com/rsutter98/NdcApp/issues/new?template=bug_report.md)** - Found an issue?
+- **💡 [Request Features](https://github.com/rsutter98/NdcApp/issues/new?template=feature_request.md)** - Have an idea?
+- **💬 [Discussions](https://github.com/rsutter98/NdcApp/discussions)** - Ask questions, share ideas
+- **📚 [Documentation Issues](https://github.com/rsutter98/NdcApp/issues/new?labels=documentation)** - Help us improve docs
 
-## 📚 Dokumentations-Wartung
+### Common Issues
+- **App won't start**: Check system requirements, restart device
+- **Talks not loading**: Check internet connection, use pull-to-refresh
+- **Notifications not working**: Check app permissions and device settings
+- **Ratings not saving**: Ensure app is fully loaded, try app restart
 
-### Für Entwickler und Mitwirkende
+## 📄 License
 
-**Bei jedem Issue/Feature:**
-- Aktualisieren Sie diese README.md wenn neue Features hinzugefügt werden
-- Erweitern Sie die FEATURES.md bei neuen Funktionalitäten
-- Aktualisieren Sie Screenshots bei UI-Änderungen
-- Passen Sie die Benutzerhandbuch-Sektion bei Workflow-Änderungen an
+This project is licensed under the MIT License. See the project repository for license details.
 
-**Dokumentations-Checkliste für Pull Requests:**
-- [ ] README.md auf Aktualität geprüft
-- [ ] Screenshots bei UI-Änderungen aktualisiert
-- [ ] Benutzerhandbuch bei neuen Features erweitert
-- [ ] Links auf Funktionalität getestet
+## 🙏 Acknowledgments
+
+- **NDC Conferences** - For inspiring this application
+- **Microsoft MAUI Team** - For the excellent cross-platform framework
+- **Contributors** - Thank you to everyone who has contributed to this project
+
+---
+
+**⭐ Star this repository if you find it useful!**
+
+**🔗 Links**: [Homepage](https://github.com/rsutter98/NdcApp) | [Releases](https://github.com/rsutter98/NdcApp/releases) | [Documentation](docs/README.md) | [Issues](https://github.com/rsutter98/NdcApp/issues)
 - [ ] Deutsche Übersetzungen korrekt
 
 **Datei-Struktur der Dokumentation:**
