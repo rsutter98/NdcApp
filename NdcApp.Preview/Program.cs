@@ -32,6 +32,23 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Add custom route for mobile setup status page
+app.MapGet("/status", async context =>
+{
+    var statusFilePath = Path.Combine(app.Environment.WebRootPath, "status.html");
+    if (File.Exists(statusFilePath))
+    {
+        var content = await File.ReadAllTextAsync(statusFilePath);
+        context.Response.ContentType = "text/html";
+        await context.Response.WriteAsync(content);
+    }
+    else
+    {
+        context.Response.StatusCode = 404;
+        await context.Response.WriteAsync("Status page not found");
+    }
+});
+
 app.MapRazorPages();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

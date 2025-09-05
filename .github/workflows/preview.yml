@@ -97,23 +97,55 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       
+    - name: Update Preview Status Page
+      run: |
+        # Update PREVIEW_STATUS.md with current deployment info
+        TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+        COMMIT_SHORT=${GITHUB_SHA:0:7}
+        BRANCH_NAME=${GITHUB_REF_NAME}
+        
+        # Replace placeholders in PREVIEW_STATUS.md
+        sed -i "s/\*\*Status:\*\* ⏳ Warten auf ersten Deployment/**Status:** ✅ Deployment erfolgreich/" PREVIEW_STATUS.md
+        sed -i "s/\*\*Letztes Update:\*\* Noch kein Build/**Letztes Update:** $TIMESTAMP/" PREVIEW_STATUS.md
+        sed -i "s/\*\*Preview URL:\*\* Noch nicht verfügbar/**Preview URL:** http:\/\/localhost:8080 (lokal) | http:\/\/[IHRE-IP]:8080 (iPhone)/" PREVIEW_STATUS.md
+        sed -i "s/\*\*Branch:\*\* Noch kein Build/**Branch:** $BRANCH_NAME/" PREVIEW_STATUS.md
+        sed -i "s/\*\*Commit:\*\* -/**Commit:** $COMMIT_SHORT/" PREVIEW_STATUS.md
+        sed -i "s/\*\*Build Zeit:\*\* -/**Build Zeit:** $TIMESTAMP/" PREVIEW_STATUS.md
+        sed -i "s/\*\*Docker Image:\*\* -/**Docker Image:** ${{ env.REGISTRY }}\/${{ env.IMAGE_NAME }}:$BRANCH_NAME/" PREVIEW_STATUS.md
+        sed -i "s/\*\*Container Status:\*\* Noch nicht deployed/**Container Status:** Bereit für Deployment/" PREVIEW_STATUS.md
+        sed -i "s/{{ TIMESTAMP }}/$TIMESTAMP/" PREVIEW_STATUS.md
+        
+        # Update the web status page
+        sed -i "s/{{ TIMESTAMP }}/$TIMESTAMP/" NdcApp.Preview/wwwroot/status.html
+      
     - name: Deploy with Docker Compose
       run: |
-        echo "🚀 Preview deployment would run here!"
+        echo "🚀 Preview deployment information:"
         echo "Docker image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}"
-        echo "Preview URL: http://preview.ndcapp.local:8080"
+        echo "Build time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+        echo "Commit: ${GITHUB_SHA:0:7}"
+        echo "Branch: ${{ github.ref_name }}"
         echo ""
-        echo "To deploy locally, run:"
-        echo "docker-compose -f docker-compose.preview.yml up -d"
+        echo "📱 iPhone/Mobile Setup:"
+        echo "1. Auf dem Computer: docker-compose -f docker-compose.preview.yml up -d"
+        echo "2. IP-Adresse finden: ipconfig (Windows) oder ifconfig (macOS/Linux)"
+        echo "3. iPhone Safari: http://[IHRE-IP]:8080"
+        echo "4. Status-Seite: http://[IHRE-IP]:8080/status.html"
         echo ""
-        echo "To access the preview app:"
-        echo "1. Navigate to http://localhost:8080 on the same computer"
-        echo "2. To access from iPhone/mobile devices:"
-        echo "   - Find your computer's IP address (e.g., 192.168.1.100)"
-        echo "   - Navigate to http://YOUR_IP:8080 on your iPhone"
-        echo "   - Example: http://192.168.1.100:8080"
-        echo "3. Browse the NDC Conference Planner"
-        echo "4. Test talk selection and rating features"
+        echo "🔗 Preview Status Seite verfügbar unter:"
+        echo "   - http://localhost:8080/status.html (lokal)"
+        echo "   - http://[IHRE-IP]:8080/status.html (iPhone)"
+        echo ""
+        echo "✅ Preview erfolgreich erstellt und bereit für Deployment!"
+        
+    - name: Commit updated status
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add PREVIEW_STATUS.md NdcApp.Preview/wwwroot/status.html
+        git diff --staged --quiet || git commit -m "🤖 Auto-update preview status after deployment [skip ci]"
+        git push
 
   comment-pr:
     name: Comment on PR
@@ -141,27 +173,41 @@ jobs:
 
           The preview version of your MAUI app has been built and is ready for testing!
 
+          ### 📱 **NEUER iPhone Setup Guide verfügbar!**
+          
+          **Live Status Seite:** Nach dem Deployment verfügbar unter \`http://[IHRE-IP]:8080/status.html\`
+          
+          Diese Seite enthält:
+          - ✅ **Schritt-für-Schritt iPhone Anleitung** mit QR-Code Generator
+          - ✅ **Automatisches IP-Erkennung** für einfacheren Setup
+          - ✅ **Interaktive Netzwerk-Tests** zur Diagnose
+          - ✅ **Live Deployment Status** mit aktuellen Informationen
+          - ✅ **Troubleshooting Guide** für häufige Probleme
+
           ### 🐳 Docker Deployment
           The preview app is containerized and ready to deploy. Use the following commands:
 
           \`\`\`bash
-          # Build and run locally
+          # Build und Start (optimal für iPhone Zugang)
           docker-compose -f docker-compose.preview.yml up -d
 
-          # Access the app locally
+          # Lokaler Zugang
           open http://localhost:8080
           
-          # For iPhone/mobile access:
-          # 1. Find your computer's IP address (ipconfig/ifconfig)
-          # 2. Access http://YOUR_IP:8080 from your iPhone
-          # Example: http://192.168.1.100:8080
+          # iPhone Setup Status Seite
+          open http://localhost:8080/status.html
+          
+          # iPhone Zugang:
+          # 1. IP-Adresse finden: ipconfig (Windows) / ifconfig (macOS/Linux)
+          # 2. iPhone Safari: http://[IHRE-IP]:8080
+          # 3. Status & Setup: http://[IHRE-IP]:8080/status.html
           \`\`\`
 
-          ### 📱 iPhone Access
-          - ✅ **Network access enabled** - App binds to all network interfaces
-          - ✅ **Mobile responsive** - Web UI adapts to mobile screens  
-          - ✅ **Touch optimized** - Optimized for touch interactions
-          - 🔧 **Setup required** - Ensure both devices are on same WiFi network
+          ### 📱 iPhone Zugang - Vereinfacht
+          1. **🔧 Computer vorbereiten:** \`docker-compose -f docker-compose.preview.yml up -d\`
+          2. **📱 Status Seite öffnen:** \`http://[IP]:8080/status.html\`
+          3. **📋 Anleitung folgen:** Interaktive Schritt-für-Schritt Anleitung
+          4. **📸 QR Code nutzen:** Automatisch generiert für schnellen Zugang
 
           ### 🌟 Features Available
           - ✅ **Conference talk browsing** - View all available talks
@@ -170,14 +216,18 @@ jobs:
           - ✅ **Filtering & search** - Filter by day, category, or search text
           - ✅ **Responsive design** - Works on desktop and mobile
           - ✅ **Real-time updates** - Live statistics and interactions
+          - ✅ **NEW: Mobile Setup Guide** - Interactive iPhone setup assistance
 
-          ### 📱 Preview Screenshot
-          ![NDC Conference Planner Preview](https://github.com/user-attachments/assets/7f811830-783d-40dc-bd9c-c31ead19ad66)
+          ### 📊 Deployment Status
+          
+          **Live Status:** [PREVIEW_STATUS.md](../PREVIEW_STATUS.md) - Automatisch aktualisiert nach jedem Build  
+          **Interactive Guide:** \`http://[IHRE-IP]:8080/status.html\` - Nach Deployment verfügbar
 
           This web preview replicates the core functionality of your MAUI app for easy demonstration and testing purposes.
 
           ---
-          *Built from commit: ${context.sha.substring(0, 7)}*`;
+          *Built from commit: ${context.sha.substring(0, 7)}*
+          *📱 iPhone Setup Guide: Jetzt verfügbar über Status-Seite*`;
 
           await github.rest.issues.createComment({
             owner: context.repo.owner,

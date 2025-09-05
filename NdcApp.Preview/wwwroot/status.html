@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDC Conference Planner - Preview Status</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .status-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            margin: 0 auto;
+        }
+        .status-badge {
+            font-size: 1.1em;
+            padding: 10px 20px;
+            border-radius: 25px;
+        }
+        .copy-btn {
+            transition: all 0.3s ease;
+        }
+        .copy-btn:hover {
+            transform: scale(1.05);
+        }
+        .instruction-step {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 10px 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <!-- Header -->
+        <div class="text-center text-white mb-5">
+            <h1 class="display-4 fw-bold">
+                <i class="fas fa-mobile-alt"></i> NDC Conference Planner
+            </h1>
+            <p class="lead">Live Preview Status & iPhone Setup</p>
+        </div>
+
+        <!-- Current Status Card -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card status-card p-4">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">
+                            <i class="fas fa-chart-line text-primary"></i> Aktueller Status
+                        </h2>
+                        
+                        <div class="row text-center">
+                            <div class="col-md-3 mb-3">
+                                <span class="badge bg-warning status-badge">
+                                    <i class="fas fa-clock"></i> Warten auf Build
+                                </span>
+                                <p class="mt-2 small text-muted">Status</p>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <span class="badge bg-info status-badge">
+                                    Noch kein Build
+                                </span>
+                                <p class="mt-2 small text-muted">Letztes Update</p>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <span class="badge bg-secondary status-badge">
+                                    Nicht verfügbar
+                                </span>
+                                <p class="mt-2 small text-muted">Preview URL</p>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <span class="badge bg-primary status-badge">
+                                    <i class="fas fa-code-branch"></i> main
+                                </span>
+                                <p class="mt-2 small text-muted">Branch</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- iPhone Setup Instructions -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card status-card p-4">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            <i class="fab fa-apple text-dark"></i> iPhone Setup - Schritt für Schritt
+                        </h3>
+                        
+                        <div class="instruction-step">
+                            <h5><i class="fas fa-wifi text-primary"></i> Schritt 1: Netzwerk prüfen</h5>
+                            <p class="mb-0">iPhone und Computer müssen im <strong>gleichen WLAN</strong> sein</p>
+                        </div>
+
+                        <div class="instruction-step">
+                            <h5><i class="fas fa-network-wired text-success"></i> Schritt 2: IP-Adresse finden</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Windows:</strong>
+                                    <div class="bg-dark text-light p-2 rounded mt-1">
+                                        <code>ipconfig</code>
+                                        <button class="btn btn-sm btn-outline-light copy-btn ms-2" onclick="copyToClipboard('ipconfig')">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>macOS/Linux:</strong>
+                                    <div class="bg-dark text-light p-2 rounded mt-1">
+                                        <code>ifconfig</code>
+                                        <button class="btn btn-sm btn-outline-light copy-btn ms-2" onclick="copyToClipboard('ifconfig')">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="instruction-step">
+                            <h5><i class="fab fa-docker text-primary"></i> Schritt 3: Preview App starten</h5>
+                            <div class="bg-dark text-light p-3 rounded">
+                                <code>docker-compose -f docker-compose.preview.yml up -d</code>
+                                <button class="btn btn-sm btn-outline-light copy-btn ms-2" onclick="copyToClipboard('docker-compose -f docker-compose.preview.yml up -d')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="instruction-step">
+                            <h5><i class="fab fa-safari text-info"></i> Schritt 4: iPhone Safari öffnen</h5>
+                            <div class="input-group">
+                                <span class="input-group-text">http://</span>
+                                <input type="text" class="form-control" id="ipAddress" placeholder="IHRE-IP-ADRESSE" onkeyup="updatePreviewUrl()">
+                                <span class="input-group-text">:8080</span>
+                                <button class="btn btn-outline-primary" onclick="copyPreviewUrl()">
+                                    <i class="fas fa-copy"></i> Kopieren
+                                </button>
+                            </div>
+                            <small class="text-muted">Beispiel: 192.168.1.100</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card status-card p-4 text-center">
+                    <div class="card-body">
+                        <h5><i class="fas fa-qrcode text-primary"></i> QR Code</h5>
+                        <div class="qr-placeholder mb-3">
+                            <div class="text-muted">
+                                <i class="fas fa-qrcode fa-3x"></i>
+                                <p class="mt-2 small">QR Code wird nach<br>IP-Eingabe generiert</p>
+                            </div>
+                        </div>
+                        <p class="small text-muted">iPhone Kamera auf QR Code richten für schnellen Zugang</p>
+                        <button class="btn btn-primary btn-sm" onclick="generateQR()" id="qrBtn" disabled>
+                            <i class="fas fa-magic"></i> QR Code generieren
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card status-card p-4">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4">
+                            <i class="fas fa-star text-warning"></i> Verfügbare Features
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="feature-card p-3 h-100">
+                                    <div class="text-center">
+                                        <i class="fas fa-calendar-alt fa-2x text-primary mb-2"></i>
+                                        <h5>Konferenz Talks</h5>
+                                        <p class="small text-muted">Alle verfügbaren Talks durchsuchen und Details anzeigen</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="feature-card p-3 h-100">
+                                    <div class="text-center">
+                                        <i class="fas fa-heart fa-2x text-danger mb-2"></i>
+                                        <h5>Persönliche Planung</h5>
+                                        <p class="small text-muted">Talks zur persönlichen Agenda hinzufügen und verwalten</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="feature-card p-3 h-100">
+                                    <div class="text-center">
+                                        <i class="fas fa-star fa-2x text-warning mb-2"></i>
+                                        <h5>Talk Bewertungen</h5>
+                                        <p class="small text-muted">Talks mit 1-5 Sternen bewerten und Feedback geben</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="feature-card p-3 h-100">
+                                    <div class="text-center">
+                                        <i class="fas fa-search fa-2x text-success mb-2"></i>
+                                        <h5>Filtern & Suchen</h5>
+                                        <p class="small text-muted">Nach Tag, Kategorie oder Text filtern</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="feature-card p-3 h-100">
+                                    <div class="text-center">
+                                        <i class="fas fa-mobile-alt fa-2x text-info mb-2"></i>
+                                        <h5>Responsive Design</h5>
+                                        <p class="small text-muted">Funktioniert perfekt auf Desktop und Mobile</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="feature-card p-3 h-100">
+                                    <div class="text-center">
+                                        <i class="fas fa-bolt fa-2x text-warning mb-2"></i>
+                                        <h5>Real-time Updates</h5>
+                                        <p class="small text-muted">Live Statistiken und sofortige Aktualisierungen</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card status-card p-4">
+                    <div class="card-body text-center">
+                        <h4 class="mb-4"><i class="fas fa-rocket text-primary"></i> Quick Actions</h4>
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-primary btn-lg w-100" onclick="window.open('/', '_blank')">
+                                    <i class="fas fa-play"></i> Preview App öffnen
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-outline-primary btn-lg w-100" onclick="location.reload()">
+                                    <i class="fas fa-sync"></i> Status aktualisieren
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-outline-success btn-lg w-100" onclick="checkNetworkAccess()">
+                                    <i class="fas fa-network-wired"></i> Netzwerk testen
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-outline-info btn-lg w-100" onclick="showTroubleshooting()">
+                                    <i class="fas fa-question-circle"></i> Troubleshooting
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-white mt-5">
+            <p class="small">
+                <i class="fas fa-clock"></i> Automatisch generiert: <span id="timestamp">{{ TIMESTAMP }}</span><br>
+                <i class="fas fa-sync"></i> Nächstes Update: Nach dem nächsten Build
+            </p>
+        </div>
+    </div>
+
+    <!-- Troubleshooting Modal -->
+    <div class="modal fade" id="troubleshootingModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-tools"></i> Troubleshooting</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6><i class="fas fa-mobile-alt text-danger"></i> iPhone kann nicht zugreifen</h6>
+                    <ul>
+                        <li><strong>WLAN prüfen:</strong> Beide Geräte im gleichen Netzwerk?</li>
+                        <li><strong>IP-Adresse korrekt:</strong> ipconfig/ifconfig nochmals ausführen</li>
+                        <li><strong>Port verfügbar:</strong> Ist Port 8080 frei?</li>
+                        <li><strong>Firewall:</strong> Windows/macOS Firewall kann Port blockieren</li>
+                        <li><strong>VPN/Proxy:</strong> Temporär deaktivieren</li>
+                    </ul>
+
+                    <h6><i class="fab fa-docker text-primary"></i> Docker Probleme</h6>
+                    <div class="bg-dark text-light p-2 rounded mb-2">
+                        <code># Ports prüfen</code><br>
+                        <code>netstat -an | grep 8080</code><br><br>
+                        <code># Container Status</code><br>
+                        <code>docker ps -a</code><br><br>
+                        <code># Logs anzeigen</code><br>
+                        <code>docker logs ndcapp-preview</code>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script>
+        // Update timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleString('de-DE');
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('In Zwischenablage kopiert!', 'success');
+            });
+        }
+
+        function updatePreviewUrl() {
+            const ip = document.getElementById('ipAddress').value;
+            const qrBtn = document.getElementById('qrBtn');
+            if (ip.trim()) {
+                qrBtn.disabled = false;
+            } else {
+                qrBtn.disabled = true;
+            }
+        }
+
+        function copyPreviewUrl() {
+            const ip = document.getElementById('ipAddress').value;
+            if (ip.trim()) {
+                const url = `http://${ip}:8080`;
+                copyToClipboard(url);
+            } else {
+                showToast('Bitte IP-Adresse eingeben!', 'warning');
+            }
+        }
+
+        function generateQR() {
+            const ip = document.getElementById('ipAddress').value;
+            if (!ip.trim()) {
+                showToast('Bitte IP-Adresse eingeben!', 'warning');
+                return;
+            }
+
+            const url = `http://${ip}:8080`;
+            const qrPlaceholder = document.querySelector('.qr-placeholder');
+            
+            qrPlaceholder.innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
+            
+            QRCode.toCanvas(url, { width: 180, margin: 2 }, (error, canvas) => {
+                if (error) {
+                    qrPlaceholder.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-triangle"></i><br>QR Code Fehler</div>';
+                    return;
+                }
+                qrPlaceholder.innerHTML = '';
+                qrPlaceholder.appendChild(canvas);
+                showToast('QR Code generiert!', 'success');
+            });
+        }
+
+        function checkNetworkAccess() {
+            const ip = document.getElementById('ipAddress').value;
+            if (!ip.trim()) {
+                showToast('Bitte IP-Adresse eingeben für Netzwerk-Test!', 'warning');
+                return;
+            }
+
+            showToast('Netzwerk-Test gestartet...', 'info');
+            
+            // Try to reach the preview app
+            const testUrl = `http://${ip}:8080`;
+            const img = new Image();
+            img.onload = () => showToast('✅ Netzwerk-Zugang erfolgreich!', 'success');
+            img.onerror = () => showToast('❌ Netzwerk-Zugang fehlgeschlagen. Prüfen Sie IP und Port.', 'danger');
+            img.src = testUrl + '/favicon.ico?' + Date.now();
+        }
+
+        function showTroubleshooting() {
+            new bootstrap.Modal(document.getElementById('troubleshootingModal')).show();
+        }
+
+        function showToast(message, type) {
+            // Create and show bootstrap toast
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                document.body.appendChild(toastContainer);
+            }
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toast = new bootstrap.Toast(toastContainer.lastElementChild);
+            toast.show();
+            
+            // Remove toast element after it's hidden
+            toastContainer.lastElementChild.addEventListener('hidden.bs.toast', function() {
+                this.remove();
+            });
+        }
+
+        // Auto-detect local IP and suggest it
+        window.onload = function() {
+            // Try to get local IP via WebRTC
+            const pc = new RTCPeerConnection({iceServers: []});
+            pc.createDataChannel('');
+            pc.createOffer().then(pc.setLocalDescription.bind(pc));
+            
+            pc.onicecandidate = function(ice) {
+                if (ice && ice.candidate && ice.candidate.candidate) {
+                    const candidate = ice.candidate.candidate;
+                    const ipMatch = candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
+                    if (ipMatch && !ipMatch[1].startsWith('127.')) {
+                        document.getElementById('ipAddress').placeholder = ipMatch[1] + ' (erkannt)';
+                        pc.close();
+                    }
+                }
+            };
+        };
+    </script>
+</body>
+</html>
