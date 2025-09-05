@@ -254,6 +254,40 @@ docker-compose -f docker-compose.preview.yml up -d
 
 # Access the application
 open http://localhost:8080
+
+# iPhone Setup Guide (NEW!)
+open http://localhost:8080/status
 ```
 
+### 📱 iPhone Setup - Quick Guide
+
+1. **Start Preview App:**
+   ```bash
+   docker-compose -f docker-compose.preview.yml up -d
+   ```
+
+2. **Find Your IP Address:**
+   - Windows: `ipconfig`
+   - macOS/Linux: `ifconfig`
+
+3. **Open iPhone Setup Page:**
+   - Computer: `http://localhost:8080/status`
+   - iPhone: `http://[YOUR-IP]:8080/status`
+
+4. **Follow Interactive Guide:**
+   - Enter your IP address
+   - Generate QR code for easy access
+   - Test network connectivity
+   - Access troubleshooting if needed
+
 For more information, see the main [README.md](../README.md) and [DEPLOYMENT.md](../DEPLOYMENT.md) files.
+
+---
+
+## 🆕 Auto-Updating Status
+
+The deployment status is now automatically maintained:
+
+- **Live Status:** [PREVIEW_STATUS.md](../PREVIEW_STATUS.md) - Updated after each build
+- **Interactive Guide:** `http://[YOUR-IP]:8080/status` - Always available during runtime
+- **GitHub Actions:** Automatically updates documentation and provides mobile setup instructions in PR comments
