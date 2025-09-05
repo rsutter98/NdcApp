@@ -1,8 +1,5 @@
 # Deployment Guide
 
-> **📚 Note**: This document has been moved to the new documentation structure.  
-> **🔗 Latest Version**: See [docs/operations/DEPLOYMENT.md](docs/operations/DEPLOYMENT.md)
-
 This document describes the deployment pipeline and build processes for the NdcApp.
 
 ## Overview
