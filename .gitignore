@@ -43,3 +43,4 @@ dist/
 *.lock
 # Ignore CSV in Raw if not needed
 # Resources/Raw/*.csv
+build_output.txt
