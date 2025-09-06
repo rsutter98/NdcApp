@@ -17,6 +17,19 @@ Eine .NET MAUI-Anwendung zur Planung und Verwaltung von Konferenzteilnahmen.
 - **🔧 [Build Instructions](BUILD.md)** - How to build and deploy
 - **📋 [User Manual](BENUTZERHANDBUCH.md)** - Detailed user guide (German)
 
+## 🛡️ Development Workflow
+
+This repository enforces **branch protection rules** to ensure code quality:
+
+- ✅ **All CI/CD pipelines must pass** before merging PRs
+- ✅ **Code review required** before merging
+- ✅ **99 tests** must pass (build, unit, integration)
+- ✅ **Docker deployment validation** included
+
+**Quick Setup**: Run `./scripts/verify-branch-protection.sh` to check current protection status.
+
+📋 **Branch Protection Guide**: [docs/BRANCH_PROTECTION_SETUP.md](docs/BRANCH_PROTECTION_SETUP.md)
+
 ## 🎯 Quick Overview
 
 NdcApp helps conference attendees plan their schedule, discover talks, and manage their conference experience efficiently.
