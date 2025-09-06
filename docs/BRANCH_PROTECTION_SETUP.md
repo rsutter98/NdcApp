@@ -2,6 +2,10 @@
 
 This document explains how to configure branch protection rules to ensure all CI/CD pipelines must pass before PRs can be merged.
 
+> **🎯 Goal**: PRs can only be merged when all pipelines are successful. Otherwise, merging is blocked.
+>
+> **📋 Status**: ✅ CI/CD pipelines implemented | ⚠️ Repository settings configuration required
+
 ## Required Repository Settings
 
 ### 1. Branch Protection Rules
@@ -104,10 +108,21 @@ In emergency situations, repository administrators can:
 
 To verify the setup is working:
 
-1. Create a test PR with intentionally broken code
-2. Verify that status checks fail and block the merge
-3. Fix the code and verify that status checks pass
-4. Confirm that merge is only possible after all checks are green
+1. **Run verification script**:
+   ```bash
+   ./scripts/verify-branch-protection.sh
+   ```
+
+2. **Manual verification**:
+   - Create a test PR with intentionally broken code
+   - Verify that status checks fail and block the merge
+   - Fix the code and verify that status checks pass
+   - Confirm that merge is only possible after all checks are green
+
+3. **Expected results**:
+   - ✅ Merge button should be disabled when checks are failing
+   - ✅ "All checks have passed" message when all pipelines succeed
+   - ✅ Required review approval before merge is possible
 
 ## Additional Security
 
@@ -116,3 +131,10 @@ Consider enabling additional protections:
 - **Include administrators** in branch protection rules
 - **Restrict who can dismiss PR reviews** to core maintainers
 - **Require linear history** to maintain clean git history
+
+## Related Documentation
+
+- **🔄 Rollback Strategy**: [docs/operations/ROLLBACK_STRATEGY.md](operations/ROLLBACK_STRATEGY.md)
+- **🚀 Deployment Guide**: [DEPLOYMENT.md](../DEPLOYMENT.md)
+- **📋 Setup Script**: [scripts/setup-branch-protection.md](../scripts/setup-branch-protection.md)
+- **✅ Verification Script**: [scripts/verify-branch-protection.sh](../scripts/verify-branch-protection.sh)

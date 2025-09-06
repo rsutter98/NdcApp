@@ -44,6 +44,9 @@ To ensure code quality, configure branch protection rules:
 - **Up-to-date branches**: PRs must be current with target branch
 
 📋 **Setup Guide**: [docs/BRANCH_PROTECTION_SETUP.md](docs/BRANCH_PROTECTION_SETUP.md)
+🔧 **Configuration Script**: [scripts/setup-branch-protection.md](scripts/setup-branch-protection.md)  
+✅ **Verification Tool**: [scripts/verify-branch-protection.sh](scripts/verify-branch-protection.sh)
+🔄 **Rollback Strategy**: [docs/operations/ROLLBACK_STRATEGY.md](docs/operations/ROLLBACK_STRATEGY.md)
 
 ### Branches
 - `main` - Production branch (protected)
