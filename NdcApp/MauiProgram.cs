@@ -1,12 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using NdcApp.Core.Services;
 using NdcApp.Services;
 using Plugin.LocalNotification;
 
 namespace NdcApp;
 
+/// <summary>
+/// Configuration class for the MAUI application startup and dependency injection.
+/// </summary>
 public static class MauiProgram
 {
+    /// <summary>
+    /// Creates and configures the MAUI application with all required services and dependencies.
+    /// </summary>
+    /// <returns>A configured MauiApp instance.</returns>
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();

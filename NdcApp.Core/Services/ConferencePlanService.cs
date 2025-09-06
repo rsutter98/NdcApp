@@ -5,12 +5,21 @@ using NdcApp.Core.Models;
 
 namespace NdcApp.Core.Services
 {
+    /// <summary>
+    /// Implementation of conference planning service for managing talk selection and organization.
+    /// </summary>
     public class ConferencePlanService : IConferencePlanService
     {
         private Dictionary<string, Talk> selectedTalks = new();
         private readonly ITalkRatingService _ratingService;
         private readonly ILoggerService _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the ConferencePlanService class.
+        /// </summary>
+        /// <param name="ratingService">The rating service for managing talk ratings.</param>
+        /// <param name="logger">The logger service for logging operations.</param>
+        /// <exception cref="ArgumentNullException">Thrown when required services are null.</exception>
         public ConferencePlanService(ITalkRatingService ratingService, ILoggerService logger)
         {
             _ratingService = ratingService ?? throw new ArgumentNullException(nameof(ratingService));
