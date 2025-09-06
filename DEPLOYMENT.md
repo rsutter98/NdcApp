@@ -15,21 +15,46 @@ The NdcApp is a .NET MAUI cross-platform application that can be deployed to:
 
 ## Continuous Integration (CI)
 
-### Pull Request Testing
-Every pull request triggers automated testing:
-- Build verification across all projects
-- Unit test execution (99+ tests)
-- Test result artifacts
-- **Preview deployment** for web-based testing
+### Pipeline Overview
+The CI/CD system now includes comprehensive validation workflows:
 
-**Workflow:** `.github/workflows/ci.yml`
-**Preview Workflow:** `.github/workflows/preview.yml`
+| Workflow | Purpose | Triggers | Status Check |
+|----------|---------|----------|--------------|
+| `ci.yml` | Core build and test validation | Push/PR to main/develop | `Build and Test` |
+| `pr-validation.yml` | Comprehensive PR validation | PR events | `PR Status Check` |
+| `preview.yml` | Preview deployment validation | Push/PR to main/develop | `Build Preview App` |
+| `release.yml` | Release builds for all platforms | Git tags/manual | N/A |
+
+### Pull Request Validation
+Every pull request now triggers comprehensive validation:
+- ✅ **Build verification** across all projects
+- ✅ **Unit test execution** (99+ tests)
+- ✅ **Dockerfile validation** for preview deployment
+- ✅ **Test result artifacts** uploaded for review
+- ✅ **Status checks** that block merging until all pass
+
+**Primary Workflows:** 
+- `.github/workflows/ci.yml` - Core CI validation
+- `.github/workflows/pr-validation.yml` - Comprehensive PR checks
+
+### Branch Protection
+To ensure code quality, configure branch protection rules:
+- **Required status checks**: All CI workflows must pass
+- **Required reviews**: Code must be reviewed before merge
+- **Up-to-date branches**: PRs must be current with target branch
+
+📋 **Setup Guide**: [docs/BRANCH_PROTECTION_SETUP.md](docs/BRANCH_PROTECTION_SETUP.md)
 
 ### Branches
-- `main` - Production branch
-- `develop` - Development branch
-- Feature branches trigger CI on PR
+- `main` - Production branch (protected)
+- `develop` - Development branch (protected)
+- Feature branches trigger full validation on PR
 
+### Recent Fixes (Issue #47)
+🔧 **Permission Issues Resolved**: 
+- Removed auto-commit functionality that caused 403 errors
+- Status updates now handled without repository write permissions
+- All pipelines must be green before PR completion
 
 ## Continuous Deployment (CD)
 
