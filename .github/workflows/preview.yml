@@ -111,7 +111,7 @@ jobs:
         sed -i "s/\*\*Branch:\*\* Noch kein Build/**Branch:** $BRANCH_NAME/" PREVIEW_STATUS.md
         sed -i "s/\*\*Commit:\*\* -/**Commit:** $COMMIT_SHORT/" PREVIEW_STATUS.md
         sed -i "s/\*\*Build Zeit:\*\* -/**Build Zeit:** $TIMESTAMP/" PREVIEW_STATUS.md
-        sed -i "s/\*\*Docker Image:\*\* -/**Docker Image:** ${{ env.REGISTRY }}\/${{ env.IMAGE_NAME }}:$BRANCH_NAME/" PREVIEW_STATUS.md
+        sed -i "s|\*\*Docker Image:\*\* -|**Docker Image:** ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$BRANCH_NAME|" PREVIEW_STATUS.md
         sed -i "s/\*\*Container Status:\*\* Noch nicht deployed/**Container Status:** Bereit für Deployment/" PREVIEW_STATUS.md
         sed -i "s/{{ TIMESTAMP }}/$TIMESTAMP/" PREVIEW_STATUS.md
         
