@@ -138,14 +138,16 @@ jobs:
         echo ""
         echo "✅ Preview erfolgreich erstellt und bereit für Deployment!"
         
-    - name: Commit updated status
+    - name: Update deployment artifacts
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add PREVIEW_STATUS.md NdcApp.Preview/wwwroot/status.html
-        git diff --staged --quiet || git commit -m "🤖 Auto-update preview status after deployment [skip ci]"
-        git push
+        echo "📊 Deployment Status Updated:"
+        echo "- PREVIEW_STATUS.md: Updated with latest deployment info"
+        echo "- status.html: Updated with current timestamp"
+        echo "- Status files are ready for manual review and commit if needed"
+        echo ""
+        echo "ℹ️  Note: Auto-commit removed to prevent permission issues."
+        echo "   Status files can be manually committed if needed."
 
   comment-pr:
     name: Comment on PR

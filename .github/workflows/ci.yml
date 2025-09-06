@@ -7,12 +7,13 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  test:
+  build-and-test:
     name: Build and Test
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -25,15 +26,59 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     
-    - name: Build
+    - name: Build Solution
       run: dotnet build --no-restore --configuration Release
     
-    - name: Test
+    - name: Run Tests
       run: dotnet test --no-build --configuration Release --verbosity normal --logger trx --results-directory TestResults
     
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results
+        name: ci-test-results-${{ github.run_number }}
         path: TestResults/*.trx
+
+    - name: CI Status Summary
+      if: success()
+      run: |
+        echo "## ✅ CI Pipeline Successful"
+        echo ""
+        echo "### Completed Steps:"
+        echo "- ✅ Repository checked out"
+        echo "- ✅ .NET 8.0 environment setup"
+        echo "- ✅ .NET workloads restored"
+        echo "- ✅ Dependencies restored successfully"
+        echo "- ✅ Solution built in Release configuration"
+        echo "- ✅ All tests passed"
+        echo "- ✅ Test results uploaded as artifacts"
+        echo ""
+        echo "### 📊 Build Information:"
+        echo "- **Branch:** ${{ github.ref_name }}"
+        echo "- **Commit:** ${{ github.sha }}"
+        echo "- **Workflow:** ${{ github.workflow }}"
+        echo "- **Run Number:** ${{ github.run_number }}"
+        echo ""
+        echo "🚀 **Status:** Ready for deployment/merge"
+
+    - name: CI Failure Summary
+      if: failure()
+      run: |
+        echo "## ❌ CI Pipeline Failed"
+        echo ""
+        echo "### ⚠️ Action Required:"
+        echo "The CI pipeline has failed. Please check the logs above to identify the issue."
+        echo ""
+        echo "### Common Fixes:"
+        echo "- Check for compilation errors in the build step"
+        echo "- Review failing tests in the test step"
+        echo "- Ensure all dependencies are properly specified"
+        echo "- Verify .NET workloads are correctly configured"
+        echo ""
+        echo "### 📊 Build Information:"
+        echo "- **Branch:** ${{ github.ref_name }}"
+        echo "- **Commit:** ${{ github.sha }}"
+        echo "- **Workflow:** ${{ github.workflow }}"
+        echo "- **Run Number:** ${{ github.run_number }}"
+        echo ""
+        echo "🔧 **Status:** Requires fixes before merge"
