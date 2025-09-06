@@ -7,10 +7,18 @@ using NdcApp.Core.Models;
 
 namespace NdcApp.Core.Services
 {
+    /// <summary>
+    /// Implementation of talk service for loading and parsing conference talk data from CSV sources.
+    /// </summary>
     public class TalkService : ITalkService
     {
         private readonly ILoggerService _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the TalkService class.
+        /// </summary>
+        /// <param name="logger">The logger service for logging operations.</param>
+        /// <exception cref="ArgumentNullException">Thrown when logger is null.</exception>
         public TalkService(ILoggerService logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

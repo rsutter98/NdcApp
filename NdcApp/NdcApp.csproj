@@ -12,6 +12,8 @@
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
         <WarningLevel>5</WarningLevel>
         <AnalysisLevel>latest</AnalysisLevel>
+        <!-- Disable documentation warnings for generated files -->
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
 
         <!-- Display name -->
         <ApplicationTitle>NDC Conference Planner</ApplicationTitle>

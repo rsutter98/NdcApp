@@ -5,16 +5,58 @@ using NdcApp.Core.Models;
 
 namespace NdcApp.Core.Services
 {
+    /// <summary>
+    /// Service interface for managing talk ratings and recommendations.
+    /// </summary>
     public interface ITalkRatingService
     {
+        /// <summary>
+        /// Adds or updates a rating for a specific talk.
+        /// </summary>
+        /// <param name="talkId">The unique identifier of the talk to rate.</param>
+        /// <param name="rating">The rating value (1-5).</param>
+        /// <param name="comment">Optional comment for the rating.</param>
         void RateTalk(string talkId, int rating, string comment = "");
+
+        /// <summary>
+        /// Gets the average rating for a specific talk.
+        /// </summary>
+        /// <param name="talkId">The unique identifier of the talk.</param>
+        /// <returns>The average rating, or 0.0 if no ratings exist.</returns>
         double GetAverageRating(string talkId);
+
+        /// <summary>
+        /// Gets the total number of ratings for a specific talk.
+        /// </summary>
+        /// <param name="talkId">The unique identifier of the talk.</param>
+        /// <returns>The number of ratings.</returns>
         int GetRatingCount(string talkId);
+
+        /// <summary>
+        /// Gets all ratings for a specific talk.
+        /// </summary>
+        /// <param name="talkId">The unique identifier of the talk.</param>
+        /// <returns>A list of ratings for the talk.</returns>
         List<TalkRating> GetRatingsForTalk(string talkId);
+
+        /// <summary>
+        /// Gets talk recommendations based on ratings and popularity.
+        /// </summary>
+        /// <param name="talks">The pool of talks to generate recommendations from.</param>
+        /// <param name="maxRecommendations">Maximum number of recommendations to return.</param>
+        /// <returns>A list of recommended talks.</returns>
         List<TalkRecommendation> GetRecommendations(List<Talk> talks, int maxRecommendations = 5);
+
+        /// <summary>
+        /// Updates the rating properties for a list of talks.
+        /// </summary>
+        /// <param name="talks">The talks to update with current rating data.</param>
         void UpdateTalkRatings(List<Talk> talks);
     }
 
+    /// <summary>
+    /// Implementation of talk rating service for managing ratings and generating recommendations.
+    /// </summary>
     public class TalkRatingService : ITalkRatingService
     {
         private readonly List<TalkRating> _ratings = new();

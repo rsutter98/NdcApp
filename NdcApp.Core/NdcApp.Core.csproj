@@ -8,6 +8,8 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>5</WarningLevel>
     <AnalysisLevel>latest</AnalysisLevel>
+    <!-- Disable documentation warnings for service implementations since interfaces are documented -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
