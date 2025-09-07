@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <TargetFrameworks Condition="'$(BuildingForRelease)' == 'true'">net8.0-android;net8.0-ios;net8.0-windows10.0.19041.0</TargetFrameworks>
+        <RuntimeIdentifiers Condition="'$(BuildingForRelease)' == 'true'">android-arm64;android-x64;ios-arm64;win10-x64</RuntimeIdentifiers>
         <RootNamespace>NdcApp</RootNamespace>
         <UseMaui>true</UseMaui>
         <SingleProject>true</SingleProject>
@@ -102,7 +103,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">
-        <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+        <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win10-x64</RuntimeIdentifier>
         <UseWinUI>true</UseWinUI>
         <EnableMsixTooling>true</EnableMsixTooling>
     </PropertyGroup>
