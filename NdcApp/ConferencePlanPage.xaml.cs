@@ -1,10 +1,12 @@
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
+using Microsoft.Maui.Essentials;
 using NdcApp.Core.Models;
 using NdcApp.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace NdcApp
 {
@@ -14,8 +16,11 @@ namespace NdcApp
         
         private List<Talk> allTalks = new();
         private Dictionary<string, Talk> selectedTalks = new(); // key: "Day|StartTime"
+        private HashSet<string> selectedTalksLookup = new(); // Optimized lookup: "Day|StartTime|Title"
         private bool showAll = true;
         private string searchText = string.Empty;
+        private string lastSearchText = string.Empty;
+        private List<Talk>? cachedFilteredTalks;
         private readonly TalkNotificationService? _notificationService;
         private readonly IConferencePlanService _conferencePlanService;
         private readonly ITalkService _talkService;
@@ -95,6 +100,7 @@ namespace NdcApp
         {
             var selectedTalksRaw = Preferences.Default.Get(SELECTED_TALKS_PREFERENCE_KEY, "");
             selectedTalks.Clear();
+            selectedTalksLookup.Clear();
             _conferencePlanService.ClearSelectedTalks();
             
             if (!string.IsNullOrEmpty(selectedTalksRaw))
@@ -115,7 +121,9 @@ namespace NdcApp
                 foreach (var talk in selected)
                 {
                     var key = $"{talk.Day}|{talk.StartTime}";
+                    var lookupKey = $"{talk.Day}|{talk.StartTime}|{talk.Title}";
                     selectedTalks[key] = talk;
+                    selectedTalksLookup.Add(lookupKey);
                     _conferencePlanService.SelectTalk(talk);
                 }
                 
@@ -136,7 +144,7 @@ namespace NdcApp
             ShowSelectedTalksOnly();
         }
 
-        public void RefreshTalksView()
+        public async void RefreshTalksView()
         {
             if (!showAll)
             {
@@ -144,32 +152,48 @@ namespace NdcApp
                 return;
             }
             
-            // Apply search filter first
-            var filteredTalks = FilterTalks(allTalks);
-            
-            // Group talks by day and time slot
-            var grouped = filteredTalks
-                .GroupBy(t => new { t.Day, t.StartTime })
-                .OrderBy(g => g.Key.Day)
-                .ThenBy(g => g.Key.StartTime)
-                .ToList();
+            // Use async to prevent UI blocking for large datasets
+            await RefreshTalksViewAsync();
+        }
 
-            var displayList = new List<TalkDisplayItem>();
-            foreach (var group in grouped)
+        private async Task RefreshTalksViewAsync()
+        {
+            await Task.Run(() =>
             {
-                foreach (var talk in group)
-                {
-                    if (talk == null) continue; // Defensive: skip null talks
-                    var key = $"{talk.Day}|{talk.StartTime}";
-                    bool isSelected = selectedTalks.ContainsKey(key) && selectedTalks[key].Title == talk.Title;
-                    displayList.Add(new TalkDisplayItem
+                // Apply search filter with caching
+                var filteredTalks = GetFilteredTalks();
+                
+                // Optimized sorting and display list creation
+                var displayList = filteredTalks
+                    .OrderBy(t => t.Day)
+                    .ThenBy(t => t.StartTime)
+                    .Select(talk => new TalkDisplayItem
                     {
-                        Talk = talk ?? new Talk(), // Defensive: never null
-                        IsSelected = isSelected
-                    });
-                }
+                        Talk = talk,
+                        IsSelected = selectedTalksLookup.Contains($"{talk.Day}|{talk.StartTime}|{talk.Title}")
+                    })
+                    .ToList();
+
+                // Update UI on main thread
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    TalksCollectionView.ItemsSource = displayList;
+                });
+            });
+        }
+
+        private List<Talk> GetFilteredTalks()
+        {
+            // Use cached results if search text hasn't changed
+            if (searchText == lastSearchText && cachedFilteredTalks != null)
+            {
+                return cachedFilteredTalks;
             }
-            TalksCollectionView.ItemsSource = displayList;
+
+            // Apply filter and cache results
+            cachedFilteredTalks = FilterTalks(allTalks);
+            lastSearchText = searchText;
+            return cachedFilteredTalks;
         }
 
         private async void OnSelectTalk(object sender, EventArgs e)
@@ -178,9 +202,11 @@ namespace NdcApp
             {
                 var talk = item.Talk;
                 var key = $"{talk.Day}|{talk.StartTime}";
+                var lookupKey = $"{talk.Day}|{talk.StartTime}|{talk.Title}";
                 
                 // Update both local storage and core service
                 selectedTalks[key] = talk;
+                selectedTalksLookup.Add(lookupKey);
                 _conferencePlanService.SelectTalk(talk);
                 
                 // Save selected talks persistently
@@ -200,10 +226,13 @@ namespace NdcApp
             {
                 var talk = item.Talk;
                 var key = $"{talk.Day}|{talk.StartTime}";
+                var lookupKey = $"{talk.Day}|{talk.StartTime}|{talk.Title}";
+                
                 if (selectedTalks.ContainsKey(key))
                 {
                     // Update both local storage and core service
                     selectedTalks.Remove(key);
+                    selectedTalksLookup.Remove(lookupKey);
                     _conferencePlanService.DeselectTalk(talk);
                     
                     Preferences.Default.Set(SELECTED_TALKS_PREFERENCE_KEY, string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
@@ -222,9 +251,11 @@ namespace NdcApp
             {
                 var talk = item.Talk;
                 var key = $"{talk.Day}|{talk.StartTime}";
+                var lookupKey = $"{talk.Day}|{talk.StartTime}|{talk.Title}";
                 
                 // Update both local storage and core service
                 selectedTalks[key] = talk;
+                selectedTalksLookup.Add(lookupKey);
                 _conferencePlanService.SelectTalk(talk);
                 
                 // Save selected talks persistently
@@ -244,10 +275,13 @@ namespace NdcApp
             {
                 var talk = item.Talk;
                 var key = $"{talk.Day}|{talk.StartTime}";
+                var lookupKey = $"{talk.Day}|{talk.StartTime}|{talk.Title}";
+                
                 if (selectedTalks.ContainsKey(key))
                 {
                     // Update both local storage and core service
                     selectedTalks.Remove(key);
+                    selectedTalksLookup.Remove(lookupKey);
                     _conferencePlanService.DeselectTalk(talk);
                     
                     Preferences.Default.Set(SELECTED_TALKS_PREFERENCE_KEY, string.Join("|", selectedTalks.Values.Select(t => $"{t.Day},{t.StartTime},{t.EndTime},{t.Room},{t.Title},{t.Speaker},{t.Category}")));
@@ -297,6 +331,13 @@ namespace NdcApp
         private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
         {
             searchText = e.NewTextValue ?? string.Empty;
+            
+            // Invalidate cache when search text changes
+            if (searchText != lastSearchText)
+            {
+                cachedFilteredTalks = null;
+            }
+            
             if (showAll)
                 RefreshTalksView();
             else
@@ -332,12 +373,12 @@ namespace NdcApp
         {
             if (showAll)
             {
-                var filteredTalks = FilterTalks(allTalks);
+                var filteredTalks = GetFilteredTalks();
                 var sorted = filteredTalks
                     .OrderBy(t => t.Speaker)
                     .Select(t => new TalkDisplayItem {
                         Talk = t,
-                        IsSelected = selectedTalks.ContainsKey($"{t.Day}|{t.StartTime}") && selectedTalks[$"{t.Day}|{t.StartTime}"].Title == t.Title
+                        IsSelected = selectedTalksLookup.Contains($"{t.Day}|{t.StartTime}|{t.Title}")
                     })
                     .ToList();
                 TalksCollectionView.ItemsSource = sorted;
@@ -358,12 +399,12 @@ namespace NdcApp
         {
             if (showAll)
             {
-                var filteredTalks = FilterTalks(allTalks);
+                var filteredTalks = GetFilteredTalks();
                 var sorted = filteredTalks
                     .OrderBy(t => t.Category)
                     .Select(t => new TalkDisplayItem {
                         Talk = t,
-                        IsSelected = selectedTalks.ContainsKey($"{t.Day}|{t.StartTime}") && selectedTalks[$"{t.Day}|{t.StartTime}"].Title == t.Title
+                        IsSelected = selectedTalksLookup.Contains($"{t.Day}|{t.StartTime}|{t.Title}")
                     })
                     .ToList();
                 TalksCollectionView.ItemsSource = sorted;
@@ -384,13 +425,13 @@ namespace NdcApp
         {
             if (showAll)
             {
-                var filteredTalks = FilterTalks(allTalks);
+                var filteredTalks = GetFilteredTalks();
                 var sorted = filteredTalks
                     .OrderByDescending(t => t.AverageRating)
                     .ThenByDescending(t => t.RatingCount)
                     .Select(t => new TalkDisplayItem {
                         Talk = t,
-                        IsSelected = selectedTalks.ContainsKey($"{t.Day}|{t.StartTime}") && selectedTalks[$"{t.Day}|{t.StartTime}"].Title == t.Title
+                        IsSelected = selectedTalksLookup.Contains($"{t.Day}|{t.StartTime}|{t.Title}")
                     })
                     .ToList();
                 TalksCollectionView.ItemsSource = sorted;
