@@ -10,7 +10,7 @@ namespace NdcApp;
 public partial class MainPage : ContentPage
 {
     private const string SELECTED_TALKS_PREFERENCE_KEY = "SelectedTalks";
-    
+
     public MainPage()
     {
         InitializeComponent();
@@ -24,7 +24,9 @@ public partial class MainPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Navigation Error", ex.Message, "OK");
+            System.Diagnostics.Debug.WriteLine($"Navigation Error: {ex}");
+            System.Diagnostics.Trace.WriteLine($"Navigation Error: {ex}");
+            Console.WriteLine($"Navigation Error: {ex}");
         }
     }
 
