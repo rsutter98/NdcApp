@@ -1,43 +1,137 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="NdcApp.MainPage">
+             x:Class="NdcApp.MainPage"
+             BackgroundColor="{StaticResource NdcPrimary}">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <Color x:Key="NdcPrimary">#0A2342</Color>
-            <Color x:Key="NdcAccent">#FFB400</Color>
-            <Color x:Key="NdcSecondary">#FFFFFF</Color>
-            <Style x:Key="NdcHeadline" TargetType="Label">
-                <Setter Property="FontSize" Value="32" />
-                <Setter Property="FontAttributes" Value="Bold" />
-                <Setter Property="TextColor" Value="{StaticResource NdcAccent}" />
-            </Style>
-            <Style x:Key="NdcSubHeadline" TargetType="Label">
-                <Setter Property="FontSize" Value="20" />
-                <Setter Property="FontAttributes" Value="Bold" />
-                <Setter Property="TextColor" Value="{StaticResource NdcSecondary}" />
-            </Style>
-            <Style TargetType="Button">
-                <Setter Property="BackgroundColor" Value="{StaticResource NdcAccent}" />
-                <Setter Property="TextColor" Value="{StaticResource NdcPrimary}" />
-                <Setter Property="CornerRadius" Value="10" />
-                <Setter Property="FontAttributes" Value="Bold" />
-            </Style>
-        </ResourceDictionary>
-    </ContentPage.Resources>
     <ScrollView>
         <VerticalStackLayout Padding="0" Spacing="0" BackgroundColor="{StaticResource NdcPrimary}">
-            <Image Source="dotnet_bot.png" HeightRequest="120" Aspect="AspectFit" Margin="0,30,0,10" />
-            <Label Text="NDC Copenhagen" Style="{StaticResource NdcHeadline}" Margin="20,0,20,10" />
-            <Label Text="Experience the future of software!" Style="{StaticResource NdcSubHeadline}" Margin="20,0,20,20" />
-            <Frame BackgroundColor="{StaticResource NdcAccent}" CornerRadius="16" Padding="20" Margin="20,0">
-                <VerticalStackLayout>
-                    <Label x:Name="CurrentTimeLabel" Text="Current Time: 09:00" FontSize="16" TextColor="{StaticResource NdcPrimary}" />
-                    <Label x:Name="NextTalkLabel" Text="Next Talk: Keynote: AI is having its moment ... again" FontSize="16" TextColor="{StaticResource NdcPrimary}" />
+            <!-- Hero Section -->
+            <VerticalStackLayout Padding="20,40,20,20" Spacing="20">
+                <Image Source="dotnet_bot.png" 
+                       HeightRequest="120" 
+                       Aspect="AspectFit" />
+                
+                <Label Text="NDC Copenhagen" 
+                       Style="{StaticResource NdcHeadline}" />
+                
+                <Label Text="Experience the future of software!" 
+                       Style="{StaticResource NdcSubHeadline}" />
+            </VerticalStackLayout>
+
+            <!-- Status Card -->
+            <Frame Style="{StaticResource NdcCard}" 
+                   Margin="20,0,20,20">
+                <VerticalStackLayout Spacing="8">
+                    <HorizontalStackLayout Spacing="8">
+                        <Label Text="Current Time:" 
+                               FontAttributes="Bold" 
+                               TextColor="{StaticResource NdcPrimary}" 
+                               FontSize="16" />
+                        <Label x:Name="CurrentTimeLabel" 
+                               Text="09:00" 
+                               TextColor="{StaticResource NdcPrimary}" 
+                               FontSize="16" />
+                    </HorizontalStackLayout>
+                    
+                    <HorizontalStackLayout Spacing="8">
+                        <Label Text="Next Talk:" 
+                               FontAttributes="Bold" 
+                               TextColor="{StaticResource NdcPrimary}" 
+                               FontSize="16" />
+                        <Label x:Name="NextTalkLabel" 
+                               Text="Keynote: AI is having its moment ... again" 
+                               TextColor="{StaticResource NdcPrimary}" 
+                               FontSize="16"
+                               LineBreakMode="WordWrap" />
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Frame>
-            <Button Text="Go to My Conference Plan" Margin="20,30,20,0" Clicked="OnConferencePlanClicked" />
+
+            <!-- Action Button -->
+            <Button Text="Go to My Conference Plan" 
+                    Style="{StaticResource NdcButton}"
+                    Clicked="OnConferencePlanClicked" />
+
+            <!-- Quick Stats -->
+            <Grid Margin="20,20,20,40" 
+                  ColumnDefinitions="*,*" 
+                  RowDefinitions="Auto,Auto" 
+                  ColumnSpacing="10" 
+                  RowSpacing="10">
+                
+                <Frame Grid.Row="0" Grid.Column="0" 
+                       BackgroundColor="Transparent" 
+                       BorderColor="{StaticResource NdcAccent}" 
+                       CornerRadius="12" 
+                       Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="12" 
+                               FontSize="24" 
+                               FontAttributes="Bold" 
+                               TextColor="{StaticResource NdcAccent}" 
+                               HorizontalOptions="Center" />
+                        <Label Text="Total Talks" 
+                               FontSize="14" 
+                               TextColor="{StaticResource NdcText}" 
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="0" Grid.Column="1" 
+                       BackgroundColor="Transparent" 
+                       BorderColor="{StaticResource NdcAccent}" 
+                       CornerRadius="12" 
+                       Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="3" 
+                               FontSize="24" 
+                               FontAttributes="Bold" 
+                               TextColor="{StaticResource NdcAccent}" 
+                               HorizontalOptions="Center" />
+                        <Label Text="In My Plan" 
+                               FontSize="14" 
+                               TextColor="{StaticResource NdcText}" 
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="1" Grid.Column="0" 
+                       BackgroundColor="Transparent" 
+                       BorderColor="{StaticResource NdcAccent}" 
+                       CornerRadius="12" 
+                       Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="8" 
+                               FontSize="24" 
+                               FontAttributes="Bold" 
+                               TextColor="{StaticResource NdcAccent}" 
+                               HorizontalOptions="Center" />
+                        <Label Text="Speakers" 
+                               FontSize="14" 
+                               TextColor="{StaticResource NdcText}" 
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="1" Grid.Column="1" 
+                       BackgroundColor="Transparent" 
+                       BorderColor="{StaticResource NdcAccent}" 
+                       CornerRadius="12" 
+                       Padding="15">
+                    <VerticalStackLayout>
+                        <Label Text="4" 
+                               FontSize="24" 
+                               FontAttributes="Bold" 
+                               TextColor="{StaticResource NdcAccent}" 
+                               HorizontalOptions="Center" />
+                        <Label Text="Rooms" 
+                               FontSize="14" 
+                               TextColor="{StaticResource NdcText}" 
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
         </VerticalStackLayout>
     </ScrollView>
 
