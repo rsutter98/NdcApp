@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework Condition="'$(BuildingForRelease)' != 'true'">net8.0-windows10.0.19041.0</TargetFramework>
         <TargetFrameworks Condition="'$(BuildingForRelease)' == 'true'">net8.0-android;net8.0-ios;net8.0-windows10.0.19041.0</TargetFrameworks>
-        <RuntimeIdentifiers Condition="'$(BuildingForRelease)' == 'true'">android-arm64;android-x64;ios-arm64;win10-x64</RuntimeIdentifiers>
         <RootNamespace>NdcApp</RootNamespace>
         <UseMaui>true</UseMaui>
         <SingleProject>true</SingleProject>
@@ -25,24 +24,16 @@
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0.0</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
+    </PropertyGroup>
 
-
-        <!-- Windows packaging configuration -->
-        <WindowsPackageType>MSIX</WindowsPackageType>
-        <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-        
-        <!-- Windows platform versions -->
-        <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">10.0.19041.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">10.0.19041.0</TargetPlatformMinVersion>
-        <SupportedOSPlatformVersion Condition="'$(TargetFramework)' != 'net8.0-windows10.0.19041.0'">10.0.17763.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion Condition="'$(TargetFramework)' != 'net8.0-windows10.0.19041.0'">10.0.17763.0</TargetPlatformMinVersion>
-        
-        <!-- MSIX packaging properties -->
-        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-        <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-        <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
-        <GenerateTestArtifacts>True</GenerateTestArtifacts>
-        <AppxBundle>Never</AppxBundle>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
+        <RuntimeIdentifier>android-arm64</RuntimeIdentifier>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-ios'">
+        <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     </PropertyGroup>
 
     <ItemGroup>
@@ -90,6 +81,7 @@
 
     <!-- Platform-specific configurations -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
+        <RuntimeIdentifier>android-arm64</RuntimeIdentifier>
         <AndroidPackageFormat>apk</AndroidPackageFormat>
         <AndroidUseAapt2>true</AndroidUseAapt2>
         <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
@@ -103,9 +95,13 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">
-        <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win10-x64</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <UseWinUI>true</UseWinUI>
         <EnableMsixTooling>true</EnableMsixTooling>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(BuildingForRelease)' == 'true'">
+        <TargetFrameworks>net8.0-android;net8.0-ios;net8.0-windows10.0.19041.0</TargetFrameworks>
     </PropertyGroup>
 
 </Project>

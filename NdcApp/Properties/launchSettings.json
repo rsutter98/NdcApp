@@ -7,7 +7,8 @@
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "framework": "net8.0-windows10.0.19041.0"
     },
     "NdcApp (Android)": {
       "commandName": "Project",
@@ -15,7 +16,8 @@
       "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "framework": "net8.0-android"
     },
     "NdcApp (iOS)": {
       "commandName": "Project",
@@ -23,8 +25,8 @@
       "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "framework": "net8.0-ios"
     }
   }
 }
-
