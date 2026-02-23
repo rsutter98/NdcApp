@@ -83,7 +83,7 @@ NdcApp/
 │   ├── Services/          # Business services
 │   └── Converters/        # UI helper converters
 ├── NdcApp.Preview/        # Blazor Web Preview
-├── NdcApp.Tests/          # Test Suite (99 tests)
+├── NdcApp.Tests/          # Test Suite (92 tests)
 └── docs/                  # Documentation
 ```
 
@@ -95,7 +95,12 @@ NdcApp/
 
 #### Services (`NdcApp.Core/Services/`)
 - **TalkService.cs**: CSV loading and parsing
-- **ConferencePlanService.cs**: Talk selection and management
+- **TalkFilterService.cs**: Case-insensitive full-text talk search
+- **TalkRatingService.cs**: In-memory ratings and recommendation engine
+- **ConferencePlanService.cs**: Talk selection, sorting, and persistence
+- **TalkNotificationService.cs**: Multi-reminder notification scheduling
+- **ErrorHandlingService.cs**: Exception-to-user-message mapping
+- **LoggerService.cs**: `ILoggerService` wrapping `Microsoft.Extensions.Logging`
 - Pure business logic, framework-independent
 
 #### UI Layer (`NdcApp/`)
@@ -108,12 +113,16 @@ NdcApp/
 ### Test Organization
 The test suite covers all business logic comprehensively:
 
-- **TalkModelTests.cs** (8 tests) - Data model validation
-- **TalkServiceTests.cs** (10 tests) - CSV parsing and loading
+- **TalkServiceTests.cs** (8 tests) - CSV parsing and loading
+- **TalkFilterServiceTests.cs** (9 tests) - Full-text search filtering
+- **TalkRatingServiceTests.cs** (10 tests) - Ratings and recommendations
 - **ConferencePlanServiceTests.cs** (21 tests) - Core business logic
-- **UIConvertersTests.cs** (8 tests) - UI helper functions
+- **ConferencePlanServiceRatingTests.cs** (7 tests) - Rating delegation
+- **TalkNotificationServiceTests.cs** (5 tests) - Notification scheduling
+- **ErrorHandlingServiceTests.cs** (7 tests) - Error handling
 - **IntegrationTests.cs** (5 tests) - End-to-end scenarios
 - **ActualDataTests.cs** (2 tests) - Real data validation
+- **PerformanceTests.cs** (4 tests) - Performance baselines
 
 ### Running Tests
 ```bash
@@ -217,7 +226,7 @@ dotnet build -f net8.0-ios -c Release
 5. Submit pull request with clear description
 
 ### Pull Request Requirements
-- [ ] All tests passing (99+ tests)
+- [ ] All tests passing (92+ tests)
 - [ ] New features have corresponding tests
 - [ ] Documentation updated for user-facing changes
 - [ ] Code follows established patterns

@@ -82,7 +82,7 @@ git push origin feature/your-feature-name
 ## 📋 Pull Request Guidelines
 
 ### Before Submitting
-- [ ] **All tests pass** (99+ tests must remain passing)
+- [ ] **All tests pass** (92+ tests must remain passing)
 - [ ] **New code has tests** (maintain high test coverage)
 - [ ] **Documentation updated** (for user-facing changes)
 - [ ] **Code follows style** (consistent with existing code)
@@ -171,7 +171,7 @@ All changes should include appropriate tests:
 - **Platform Tests**: Platform-specific functionality
 
 ### Test Coverage
-- Maintain **99+ passing tests**
+- Maintain **92+ passing tests**
 - New features need **corresponding tests**
 - Bug fixes need **regression tests**
 - Edge cases should be **tested**

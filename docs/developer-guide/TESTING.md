@@ -19,39 +19,72 @@ The core business logic has been extracted into a separate class library for tes
 - **Models/Talk.cs**: Conference talk data model
 - **Services/TalkService.cs**: CSV loading and parsing
 - **Services/ConferencePlanService.cs**: Talk selection and management
-- **Converters/UIConverters.cs**: UI conversion logic
+- **Services/TalkFilterService.cs**: Full-text talk search
+- **Services/TalkRatingService.cs**: Ratings and recommendation engine
+- **Services/TalkNotificationService.cs**: Notification scheduling
+- **Services/ErrorHandlingService.cs**: Exception handling and user messages
+- **Services/LoggerService.cs**: Logging abstraction
 
 ### Test Files
 
-1. **TalkModelTests.cs** (8 tests)
-   - Tests the Talk model properties and validation
-   - Covers default values, property setting, and various valid inputs
-
-2. **TalkServiceTests.cs** (10 tests)
+1. **TalkServiceTests.cs** (8 tests)
    - Tests CSV file loading and parsing
    - Covers error handling for missing files and invalid data
    - Tests both file-based and string-based parsing methods
 
-3. **UIConvertersTests.cs** (8 tests)
-   - Tests boolean inversion, text conversion, and color conversion
-   - Covers all UI converter functionality used in the MAUI app
+2. **TalkFilterServiceTests.cs** (9 tests)
+   - Tests full-text search across title, speaker, category, and room
+   - Case-insensitive matching, empty/null input handling
+
+3. **TalkRatingServiceTests.cs** (10 tests)
+   - Tests rating submission, average calculation, and rating count
+   - Tests recommendation score computation
 
 4. **ConferencePlanServiceTests.cs** (21 tests)
    - Tests talk selection and deselection
    - Tests persistence through serialization/deserialization
-   - Tests all sorting methods (speaker, category, chronological)
+   - Tests all sorting methods (speaker, category, chronological, rating)
    - Tests time conflict handling (same time slot selection)
    - Tests next talk calculation
 
-5. **IntegrationTests.cs** (5 tests)
-   - End-to-end workflow testing
-   - Complete conference scenario simulation
-   - Edge case handling
-   - Cross-component integration testing
+5. **ConferencePlanServiceRatingTests.cs** (7 tests)
+   - Tests rating delegation from `ConferencePlanService` to `ITalkRatingService`
+   - Tests `UpdateAllTalkRatings` and recommendation retrieval
 
-6. **ActualDataTests.cs** (2 tests)
-   - Tests with real CSV data structure
-   - Validates against known NDC conference data format
+6. **TalkNotificationServiceTests.cs** (5 tests)
+   - Tests notification scheduling for selected talks
+   - Tests permission request flow and cancellation
+
+7. **ErrorHandlingServiceTests.cs** (7 tests)
+   - Tests user-friendly message mapping for each exception type
+   - Tests `HandleErrorAsync` and `LogError`
+
+8. **LoggerServiceTests.cs** (2 tests)
+   - Tests log level delegation to `ILogger`
+
+9. **NotificationIntegrationTests.cs** (3 tests)
+   - End-to-end notification scheduling integration
+
+10. **IntegrationTests.cs** (5 tests)
+    - End-to-end workflow testing
+    - Complete conference scenario simulation
+    - Cross-component integration
+
+11. **ActualDataTests.cs** (2 tests)
+    - Tests with real CSV data structure
+    - Validates against known NDC conference data format
+
+12. **RealDataNotificationTests.cs** (2 tests)
+    - Notification scheduling using production-like talk data
+
+13. **PerformanceTests.cs** (4 tests)
+    - Timing assertions for CSV loading and filtering operations
+
+14. **PerformanceBenchmarkTests.cs** (4 tests)
+    - Benchmark-style tests for sorting and recommendation computation
+
+15. **UnitTest1.cs** (3 tests)
+    - Smoke tests for basic service construction
 
 ## Running Tests
 
@@ -71,8 +104,8 @@ dotnet test --collect:"XPlat Code Coverage"
 
 ## Test Statistics
 
-- **Total Tests**: 99
-- **Test Classes**: 6
+- **Total Tests**: 92
+- **Test Classes**: 15
 - **All tests passing**: ✅
 - **Code Coverage**: Comprehensive coverage of all business logic
 
