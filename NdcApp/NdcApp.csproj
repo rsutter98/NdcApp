@@ -63,7 +63,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.14"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.5"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.8"/>
         <PackageReference Include="Plugin.LocalNotification" Version="11.1.4"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
             <PrivateAssets>all</PrivateAssets>
